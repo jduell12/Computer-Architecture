@@ -2,6 +2,11 @@
 
 import sys
 
+#set instructions in binary
+HLT = 0b00000001
+LDI = 0b10000010
+PRN = 0b01000111
+
 class CPU:
     """Main CPU class."""
 
@@ -67,14 +72,41 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        halted = False
+        
+        while not halted:
+            #gets the instruction from the memory using the address in pc 
+            instruction = self.ram[self.pc]
+            
+            #gets the next 2 bytes of data to use in case the instruction needs the next bytes in order to perform the instruction 
+            operand_a = self.ram_read(self.pc + 1)
+            operand_b = self.ram_read(self.pc + 2)
+            
+            #checks for different instruction cases 
+            if instruction == HLT: #halts the CPU and exits the emulator 
+                halted = True
+                self.pc += 1
+            elif instruction == LDI: #set the value of the register to an integer 
+                #operand_a is the register number
+                #operand_b is the value to set the register to
+                self.reg[operand_a] = operand_b
+                self.pc += 3
+            elif instruction == PRN: #prints numeric value stored in given register 
+                #operand_a is the register number
+                print(self.reg[operand_a])
+                self.pc += 2
+            else:
+                print(f"Unknown instruction {instruction}")
+                sys.exit(1)
 
     def ram_read(self, address):
         "Accept the address to read and returns the value stored there"
+        "Get the address through the pc register"
         #return self.ram[self.mar] 
         return self.ram[address]
     
-    def ram_write(self, address, value):
+    def ram_write(self, value):
         "Writes the value to the address passed in"
+        "Gets the address through the pc register "
         # self.ram[self.mar] = self.mdr
-        self.ram[address] = value
+        self.ram[self.pc] = value
