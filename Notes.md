@@ -1,6 +1,6 @@
 # Number Bases
 
-- Base 2 - binary
+- Base 2 - binary "bits"
 - Base 8 - octal
 - Base 10 - decimal
 - Base 16 - hexadecimal ("hex")
@@ -23,8 +23,8 @@
         - 1 (1s place) --> 1
         - 10 (2s place) --> 2
         - 11 (2s place) --> 3
-        - 100 (4s place) --> 4
-        - 101 --> 5
+        - 100 (4s place) --> 4 * 1 + 2 * 0 + 1 * 0 --> 4
+        - 101 --> 4 * 1 + 2 * 0 + 1 * 1 --> 5
         - 110 --> 6 
         - 111 --> 7
         - 1000 --> 8
@@ -34,3 +34,41 @@
     - 8s = 2^3
     - 16s = 2^4
     - etc. 
+
+- Base 16 - hexadecimal "hex"
+    - Digits: 0-9, A-F
+    - Counting
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 7
+        - 8
+        - 9
+        - A --> 10
+        - B --> 11
+        - C --> 12
+        - D --> 13
+        - E --> 14
+        - F --> 15
+    - 1F --> 16
+# Convert Hex to Binary
+- 1 hex digit === 4 binary digits
+- 0x87 --> 0b ???? ???? --> 0b 1000 0111 --> 0b10000111
+- Convert the Binary to Decimal
+    - 0b10000111 --> 270
+
+- 0x0C --> 0b 0000 1100 --> 0b00001100 --> 0b1100
+
+# Python base number
+- Python is in decimal by default  
+- Let python know you want the number in binary 
+     - 0b110
+- Prefixes 
+    - 0b --> binary
+    - 0x --> hex
+    - 0o --> octal 
+
