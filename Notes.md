@@ -14,3 +14,23 @@
         - 10s place = 10^1
         - 100s = 10^2
         - 1000s = 10^3
+        - etc. 
+
+- Base 2 - numbering system with 0s and 1s
+    - Digits: 0-1
+    - Counting 
+        - 0 (1s place) --> 0
+        - 1 (1s place) --> 1
+        - 10 (2s place) --> 2
+        - 11 (2s place) --> 3
+        - 100 (4s place) --> 4
+        - 101 --> 5
+        - 110 --> 6 
+        - 111 --> 7
+        - 1000 --> 8
+    - 1s = 2^0
+    - 2s = 2^1
+    - 4s = 2^2
+    - 8s = 2^3
+    - 16s = 2^4
+    - etc. 
