@@ -34,6 +34,9 @@
     - 8s = 2^3
     - 16s = 2^4
     - etc. 
+    - 1 place is a bit
+    - 4 bits == 1 nybble
+    - 8 bits == 1 byte 
 
 - Base 16 - hexadecimal "hex"
     - Digits: 0-9, A-F
@@ -63,6 +66,8 @@
 
 - 0x0C --> 0b 0000 1100 --> 0b00001100 --> 0b1100
 
+- 0xFF --. 0b 1111 1111 --> 0b11111111
+
 # Python base number
 - Python is in decimal by default  
 - Let python know you want the number in binary 
@@ -72,3 +77,16 @@
     - 0x --> hex
     - 0o --> octal 
 
+# Emulator program
+- Memory 
+    - holds bytes
+    - big array of bytes 
+    - to get or set data in memory, you need the index in the array 
+    - Index into memory array === Address === Location === Pointer 
+- Instructions have to be made up of numbers 
+    - opcode == instruction byte
+    - operands == arguments to the instruction
+- Variables are called 'registers'
+    - there are a fixed number 
+    - they have preset names 
+    - registers can each hold a single byte 
