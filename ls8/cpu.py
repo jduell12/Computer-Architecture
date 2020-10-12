@@ -7,9 +7,12 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
-        self.registers = [0] * 8
+        self.reg = [0] * 8
         self.ram = [0]*256
         self.pc = 0
+        self.ir = 0
+        self.mar = 0
+        self.mdr = 0
 
     def load(self):
         """Load a program into memory."""
@@ -65,3 +68,13 @@ class CPU:
     def run(self):
         """Run the CPU."""
         pass
+
+    def ram_read(self, address):
+        "Accept the address to read and returns the value stored there"
+        #return self.ram[self.mar] 
+        return self.ram[address]
+    
+    def ram_write(self, address, value):
+        "Writes the value to the address passed in"
+        # self.ram[self.mar] = self.mdr
+        self.ram[address] = value
