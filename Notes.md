@@ -80,12 +80,13 @@
 # Bitewise Operators
 - Boolean
     - truth table
- A | B | A and B 
+
+A | B | A and B 
 ----|----|-----
- F | F | F 
- F | T | F 
- T | F | F 
- T | T | T 
+F | F | F 
+F | T | F 
+T | F | F 
+T | T | T 
 
 # Emulator program
 - Memory 
