@@ -24,22 +24,28 @@ register = [0] * 8 #array of 8 0s
 address = 0
 
 #read program data 
-with open ("prog1") as f:
-    for line in f:
-        line = line.strip()
-        if line == '' or line[0] == '#':
-            continue 
-        try:
-            str_value = line.split('#')[0]
-            #specifies base as base 10 
-            value = int(str_value, 10)
-        except ValueError:
-            print(f"Invalid number: {str_value}")
-            sys.exit(1)
-        # load into memory at the current address
-        memory[address] = value
-        address += 1 
-
+#gets the program name from the command line 
+#sys.argv[0] is the name of the program running
+#sys.argv[1] is the next word entered into the command line
+try:
+    with open (sys.argv[1]) as f:
+        for line in f:
+            line = line.strip()
+            if line == '' or line[0] == '#':
+                continue 
+            try:
+                str_value = line.split('#')[0]
+                #specifies base as base 10 
+                value = int(str_value, 10)
+            except ValueError:
+                print(f"Invalid number: {str_value}")
+                sys.exit(1)
+            # load into memory at the current address
+            memory[address] = value
+            address += 1 
+except FileNotFoundError:
+    print(f"File not found: {sys.argv[1]}")
+    sys.exit(2)
 
 #start execution at address 0
 #keep track of the address of the currently-executing instruction 

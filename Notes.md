@@ -77,6 +77,16 @@
     - 0x --> hex
     - 0o --> octal 
 
+# Bitewise Operators
+- Boolean
+    - truth table
+    | A | B | A and B |
+    |-------------------|
+    | F | F | F |
+    | F | T | F |
+    | T | F | F |
+    | T | T | T |
+
 # Emulator program
 - Memory 
     - holds bytes
@@ -90,3 +100,4 @@
     - there are a fixed number 
     - they have preset names 
     - registers can each hold a single byte 
+
