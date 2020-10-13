@@ -14,11 +14,19 @@ class CPU:
     def __init__(self):
         """Construct a new CPU."""
         self.reg = [0] * 8 #registers on CPU
-        self.ram = [0]* 256 #memory
+        self.ram = [0] * 256 #memory
         self.pc = 0 #pointer counter register
         self.ir = 0 #instruction register
         self.mar = 0 #memory address register
-        self.mdr = 0 #memory data register
+        self.mdr = 0 #memory data
+        self.halted = False #flag to check if running
+        #sets up branch table to be able to look up instructions quickly
+        self.branchtable = {}
+        self.branchtable[HLT] = self.handle_hlt
+        self.branchtable[LDI] = self.handle_ldi
+        self.branchtable[PRN] = self.handle_prn
+        self.branchtable[MUL] = self.handle_mul
+        
 
     def load(self):
         """Load a program into memory."""
@@ -53,8 +61,8 @@ class CPU:
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
-        elif op == 'MUL': #multiples the values in the two registers together and store reult in first
-            self.reg[reg_a] *= self.reg[reg_b]
+        elif op == 'MUL': 
+            pass
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -80,9 +88,8 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        halted = False
         
-        while not halted:
+        while not self.halted:
             #gets the instruction from the memory using the address in pc 
             self.ir = self.ram[self.pc]
             
@@ -90,25 +97,30 @@ class CPU:
             operand_a = self.ram_read(self.pc + 1)
             operand_b = self.ram_read(self.pc + 2)
             
-            #checks for different instruction cases 
-            if self.ir == HLT: #halts the CPU and exits the emulator 
-                halted = True
-            elif self.ir == LDI: #set the value of the register to an integer 
-                #operand_a is the register number
-                #operand_b is the value to set the register to
-                self.reg[operand_a] = operand_b
-            elif self.ir == PRN: #prints numeric value stored in given register 
-                #operand_a is the register number
-                print(self.reg[operand_a])
-            elif self.ir == MUL: #sends to ALU to handle self.ir
-                self.alu('MUL', operand_a, operand_b)
-            else:
-                print(f"Unknown self.ir {self.ir}")
-                sys.exit(1)
+
             #gets the first two bits which gives us the number of operands in the self.ir
             instruction_length = ((self.ir & 0b11000000) >> 6) + 1
             self.pc += instruction_length
+    
+    #halts the CPU and exits the emulator 
+    def handle_hlt(self):
+        self.halted = True
+        
+    #set the value of the register to an integer 
+    def handle_ldi(self, reg_a, operand_b):
+        #operand_a is the register number
+        #operand_b is the value to set the register to
+        self.reg[reg_a] = operand_b
 
+    #prints numeric value stored in given register 
+    def handle_prn(self, reg_a):
+        #reg_a is the register number
+         print(self.reg[reg_a])
+         
+    #multiples the values in the two registers together and store reult in first
+    def handle_mul(self, reg_a, reg_b):
+        self.reg[reg_a] *= self.reg[reg_b]
+    
     def ram_read(self, address):
         "Accept the address to read and returns the value stored there"
         "Get the address through the pc register"
