@@ -115,7 +115,32 @@ A | not A (~A)
    & 0b1111000
    ------------
      0b1010000
+
+
+ want to know values of bits marked with v all else 0
+                VVVVVVV         VVVVV
+  0b10101010101010100101010101010101111101010100100100101
+& 0b00000000000011111110000000001111110000000000000000000 "and mask"
+--------------------------------------------------------------
+  0b000000000000101001000000000001011100000000000000000000
+
 ```
+- Force the lowest bit in any number to 0:
+```
+   0b1101001101
+&  0b1111111110
+-----------------
+   0b1101001100 
+```
+
+- And can be used to turn bits off
+- Or can be used to turn bits on 
+- Shift operator right >> 
+    - shifts bits to the right 
+    - ex. 10000 shift right becomes 00001
+    - can shift right by a certain number of bits 
+        - ex. x >> 2:byte
+- Shift operator left <<
 
 # Emulator program
 - Memory 
