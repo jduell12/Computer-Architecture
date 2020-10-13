@@ -12,5 +12,5 @@ cpu.load()
 # for ins in cpu.ram:
 #     if ins == 0:
 #         continue
-#     print("{0:b}".format(ins))
+#     print(bin(ins))
 cpu.run()

@@ -6,6 +6,7 @@ import sys
 HLT = 0b00000001
 LDI = 0b10000010
 PRN = 0b01000111
+MUL = 0b10100010
 
 class CPU:
     """Main CPU class."""
@@ -101,6 +102,8 @@ class CPU:
                 #operand_a is the register number
                 print(self.reg[operand_a])
                 self.pc += 2
+            elif instruction == MUL:
+                pass
             else:
                 print(f"Unknown instruction {instruction}")
                 sys.exit(1)
