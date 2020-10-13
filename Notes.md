@@ -79,6 +79,9 @@
 
 # Bitewise Operators
 - Boolean
+    - and &&
+    - or ||
+    - not !
     - truth table
 
 A | B | A and B | A or B
@@ -87,6 +90,18 @@ F | F | F | F
 F | T | F | T
 T | F | F | T
 T | T | T  | T
+
+- Bitwise
+    - and &
+    - or |
+    - not ~
+    -truth table
+A | B | A & B | A or B
+----|----|----|----
+0 | 0 | 0 | 0 
+0 | 1 | 0 | 1
+1 | 0 | 0 | 1
+1 | 1 | 1 | 1
 
 # Emulator program
 - Memory 
