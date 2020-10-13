@@ -53,7 +53,8 @@ class CPU:
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
-        #elif op == "SUB": etc
+        elif op == 'MUL': #multiples the values in the two registers together and store reult in first
+            self.reg[reg_a] *= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -92,21 +93,21 @@ class CPU:
             #checks for different instruction cases 
             if instruction == HLT: #halts the CPU and exits the emulator 
                 halted = True
-                self.pc += 1
             elif instruction == LDI: #set the value of the register to an integer 
                 #operand_a is the register number
                 #operand_b is the value to set the register to
                 self.reg[operand_a] = operand_b
-                self.pc += 3
             elif instruction == PRN: #prints numeric value stored in given register 
                 #operand_a is the register number
                 print(self.reg[operand_a])
-                self.pc += 2
-            elif instruction == MUL:
-                pass
+            elif instruction == MUL: #sends to ALU to handle instruction
+                self.alu('MUL', operand_a, operand_b)
             else:
                 print(f"Unknown instruction {instruction}")
                 sys.exit(1)
+            #gets the first two bits which gives us the number of operands in the instruction
+            instruction_length = ((instruction & 0b11000000) >> 6) + 1
+            self.pc += instruction_length
 
     def ram_read(self, address):
         "Accept the address to read and returns the value stored there"
