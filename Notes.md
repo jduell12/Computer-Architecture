@@ -84,9 +84,9 @@
     - not !
     - truth table
 
-A | B | A and B | A or B
-----|----|----- | ----
-F | F | F | F
+A | B | A and B | A or B | 
+----|----|----- | ---- | 
+F | F | F | F | 
 F | T | F | T
 T | F | F | T
 T | T | T  | T
@@ -96,13 +96,18 @@ T | T | T  | T
     - or |
     - not ~
     -truth table
-    
+
 A | B | A & B | A or B
 ----|----|----|----
 0 | 0 | 0 | 0 
 0 | 1 | 0 | 1
 1 | 0 | 0 | 1
 1 | 1 | 1 | 1
+
+A | not A (~A)
+----|----
+0 | 1 
+1 | 0 
 
 # Emulator program
 - Memory 
