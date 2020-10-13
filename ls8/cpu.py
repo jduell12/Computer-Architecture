@@ -13,12 +13,12 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
-        self.reg = [0] * 8
-        self.ram = [0]*256
-        self.pc = 0
-        self.ir = 0
-        self.mar = 0
-        self.mdr = 0
+        self.reg = [0] * 8 #registers on CPU
+        self.ram = [0]* 256 #memory
+        self.pc = 0 #pointer counter register
+        self.ir = 0 #instruction register
+        self.mar = 0 #memory address register
+        self.mdr = 0 #memory data register
 
     def load(self):
         """Load a program into memory."""
@@ -29,19 +29,19 @@ class CPU:
             #gets program from command line and opens the file
             with open(sys.argv[1]) as program:
                 #reads file line by line 
-                for instruction in program:
+                for self.ir in program:
                     #takes out leading and trailing whitespace
-                    instruction = instruction.strip()
+                    self.ir = self.ir.strip()
                     #checks if the line is empty or starts with # and skips the line
-                    if instruction == '' or instruction[0] == '#':
+                    if self.ir == '' or self.ir[0] == '#':
                         continue
                     try:
-                        str_ins = instruction.split('#')[0].strip()
-                        instruction = int(str_ins, 2)
+                        str_ins = self.ir.split('#')[0].strip()
+                        self.ir = int(str_ins, 2)
                     except ValueError:
-                        print(f"Invalid number: {instruction}")
+                        print(f"Invalid number: {self.ir}")
                         sys.exit(1)
-                    self.ram[address] = instruction
+                    self.ram[address] = self.ir
                     address += 1
         except FileNotFoundError:
             print(f"File not found: {sys.argv[1]}")
@@ -84,29 +84,29 @@ class CPU:
         
         while not halted:
             #gets the instruction from the memory using the address in pc 
-            instruction = self.ram[self.pc]
+            self.ir = self.ram[self.pc]
             
-            #gets the next 2 bytes of data to use in case the instruction needs the next bytes in order to perform the instruction 
+            #gets the next 2 bytes of data to use in case the instruction needs the next bytes in order to perform the instruction
             operand_a = self.ram_read(self.pc + 1)
             operand_b = self.ram_read(self.pc + 2)
             
             #checks for different instruction cases 
-            if instruction == HLT: #halts the CPU and exits the emulator 
+            if self.ir == HLT: #halts the CPU and exits the emulator 
                 halted = True
-            elif instruction == LDI: #set the value of the register to an integer 
+            elif self.ir == LDI: #set the value of the register to an integer 
                 #operand_a is the register number
                 #operand_b is the value to set the register to
                 self.reg[operand_a] = operand_b
-            elif instruction == PRN: #prints numeric value stored in given register 
+            elif self.ir == PRN: #prints numeric value stored in given register 
                 #operand_a is the register number
                 print(self.reg[operand_a])
-            elif instruction == MUL: #sends to ALU to handle instruction
+            elif self.ir == MUL: #sends to ALU to handle self.ir
                 self.alu('MUL', operand_a, operand_b)
             else:
-                print(f"Unknown instruction {instruction}")
+                print(f"Unknown self.ir {self.ir}")
                 sys.exit(1)
-            #gets the first two bits which gives us the number of operands in the instruction
-            instruction_length = ((instruction & 0b11000000) >> 6) + 1
+            #gets the first two bits which gives us the number of operands in the self.ir
+            instruction_length = ((self.ir & 0b11000000) >> 6) + 1
             self.pc += instruction_length
 
     def ram_read(self, address):
