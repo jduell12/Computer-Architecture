@@ -24,21 +24,27 @@ class CPU:
 
         address = 0
 
-        # For now, we've just hardcoded a program:
-
-        program = [
-            # From print8.ls8
-            0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111, # PRN R0
-            0b00000000,
-            0b00000001, # HLT
-        ]
-
-        for instruction in program:
-            self.ram[address] = instruction
-            address += 1
+        try:
+            #gets program from command line and opens the file
+            with open(sys.argv[1]) as program:
+                #reads file line by line 
+                for instruction in program:
+                    #takes out leading and trailing whitespace
+                    instruction = instruction.strip()
+                    #checks if the line is empty or starts with # and skips the line
+                    if instruction == '' or instruction[0] == '#':
+                        continue
+                    try:
+                        str_ins = instruction.split('#')[0].strip()
+                        instruction = int(str_ins, 2)
+                    except ValueError:
+                        print(f"Invalid number: {instruction}")
+                        sys.exit(1)
+                    self.ram[address] = instruction
+                    address += 1
+        except FileNotFoundError:
+            print(f"File not found: {sys.argv[1]}")
+            sys.exit(2)
 
 
     def alu(self, op, reg_a, reg_b):
