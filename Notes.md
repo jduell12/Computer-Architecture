@@ -139,7 +139,8 @@ A | not A (~A)
     - shifts bits to the right 
     - ex. 10000 shift right becomes 00001
     - can shift right by a certain number of bits 
-        - ex. x >> 2:byte
+        - ex. x >> 2
+            - shifts the byte x by 2 
 - Shift operator left <<
 
 # Emulator program

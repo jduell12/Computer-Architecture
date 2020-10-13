@@ -74,3 +74,7 @@ while not halted:
     else:
         print(f"Unknown instruction {instruction}")
         sys.exit(1)
+    #get first two bits of the instruction to know how many operands
+    #use mask to get the bits you want 
+    # inst_len = ((instruction & 0b11000000 ) >> 6) + 1
+    # pc += inst_len
