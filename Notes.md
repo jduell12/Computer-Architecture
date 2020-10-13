@@ -96,6 +96,7 @@ T | T | T  | T
     - or |
     - not ~
     -truth table
+    
 A | B | A & B | A or B
 ----|----|----|----
 0 | 0 | 0 | 0 
