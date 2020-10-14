@@ -45,6 +45,7 @@
             - add 1
             - ex
                 - 0010 --> 1101 + 1 -> 1110
+                
 Positive Number Decimal |Positive Number Binary | Negative Number Decimal| Negative Number Binary
 ----|----|----|----
 0 | 0000 | 0 | na
