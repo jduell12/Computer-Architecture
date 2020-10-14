@@ -37,6 +37,33 @@
     - 1 place is a bit
     - 4 bits == 1 nybble
     - 8 bits == 1 byte 
+    -
+    - negative numbers in binary
+        - signed (2's complement)
+        - convert number to negative
+            - invert all the bits
+            - add 1
+            - ex
+                - 0010 --> 1101 + 1 -> 1110
+Positive Number Decimal |Positive Number Binary | Negative Number Decimal| Negative Number Binary
+----|----|----|----
+0 | 0000 | 0 | na
+1 | 0001 | -1 | 1111
+2 | 0010 | -2 | 1110
+3 | 0011 | -3 | 1101
+4 | 0100 | -4 | 1100
+5 | 0101 | -5 | 1011
+6 | 0110 | -6 | 1010
+7 | 0111 | -7 | 1001
+8 | 1000 | -8 | 1000
+9 | 1001 | -9 | 0111
+10 | 1010 | -10 | 0110
+11 | 1011 | -11 | 0101
+12 | 1100 | -12 | 0100 
+13 | 1101 | -13 | 0011
+14 | 1110 | -14 | 0010
+15 | 1111 | -15 | 0001
+
 
 - Base 16 - hexadecimal "hex"
     - Digits: 0-9, A-F
