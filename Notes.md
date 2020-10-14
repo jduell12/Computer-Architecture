@@ -157,3 +157,30 @@ A | not A (~A)
     - they have preset names 
     - registers can each hold a single byte 
 
+# CPU Stack 
+- memory map
+    - 256 array of addresses in ram
+    - address: value stored at that address
+    - FF: 00
+    - FE: 00
+    - FD: 00
+    - FB: 00
+    - FA: 00
+    - F9: 00
+    - F8: 00
+    - F7: 00
+    - F6: 00
+    - F5: 00
+    - F4: 00 <-- Stack pointer
+    - F3: 00
+    - F2: 00
+    - F1: 00
+    - F0: 00
+    - EF: 00
+    - ...
+    - 05: 00
+    - 04: 00
+    - 03: XX
+    - 02: XX
+    - 01: XX
+    - 00: XX <-- pointer counter
