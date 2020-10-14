@@ -19,7 +19,13 @@ class CPU:
             'LDI' : 0b0010,
             'MOD' : 0b0100,
             'MUL' : 0b0010,
+            'NOT' : 0b1001,
+            'OR'  : 0b1010,
             'PRN' : 0b0111,
+            'SHL' : 0b1100,
+            'SHR' : 0b1101,
+            'SUB' : 0b0001,
+            'XOR' : 0b1011
         }
         self.reg = [0] * 8 #registers on CPU
         self.ram = [0] * 256 #memory
@@ -47,7 +53,13 @@ class CPU:
         self.branchtable[self.opcodes['LDI']] = self.handle_ldi
         self.branchtable[self.opcodes['MOD']] = self.handle_mod
         self.branchtable[self.opcodes['MUL']] = self.handle_mul
+        self.branchtable[self.opcodes['NOT']] = self.handle_not
+        self.branchtable[self.opcodes['OR']]  = self.handle_or
         self.branchtable[self.opcodes['PRN']] = self.handle_prn
+        self.branchtable[self.opcodes['SHL']] = self.handle_shl
+        self.branchtable[self.opcodes['SHR']] = self.handle_shr
+        self.branchtable[self.opcodes['SUB']] = self.handle_sub 
+        self.branchtable[self.opcodes['XOR']] = self.handle_xor 
         
 
     def load(self):
@@ -90,7 +102,7 @@ class CPU:
             self.branchtable[self.opcodes[op]](reg_a, reg_b)
         
         #check if it's one of the operations with only 1 register needed
-        if op == 'INC' or op =='DEC':
+        if op == 'INC' or op =='DEC' or op == 'NOT':
             self.branchtable[self.opcodes[op]](reg_a)
         
         try:
@@ -222,6 +234,14 @@ class CPU:
     #multiples the values in the two registers together and stores the result in the first register
     def handle_mul(self, reg_a, reg_b):
         self.reg[reg_a] *= self.reg[reg_b]
+        
+    #perform a bitwise NOT on the value in the given register and store the result in the same register
+    def handle_not(self, reg_a):
+        self.reg[reg_a] = ~self.reg[reg_a]
+        
+    #preforms a bitwise OR between the values in two registers and stores the result in the first register
+    def handle_or(self, reg_a, reg_b):
+        self.reg[reg_a] = self.reg[reg_a] | self.reg[reg_b]
 
     #prints numeric value stored in given register 
     def handle_prn(self, reg_a):
@@ -239,3 +259,19 @@ class CPU:
         "Gets the address through the pc register "
         # self.ram[self.mar] = self.mdr
         self.ram[self.pc] = value
+        
+    #shifts the value in the first register by the number of bits specified in the second register to the left 
+    def handle_shl(self, reg_a, reg_b):
+        self.reg[reg_a] = self.reg[reg_a] << self.reg[reg_b]
+        
+    #shifts the value in the first register by the of bits specified in the second register to the right
+    def handle_shr(self, reg_a, reg_b):
+        self.reg[reg_a] = self.reg[reg_a] >> self.reg[reg_b] 
+        
+    #subtracts the value in the first register by the value in the second register and stores the result in the first register
+    def handle_sub(self, reg_a, reg_b):
+        self.reg[reg_a] -= self.reg[reg_b]
+        
+    #performs a bitwise XOR between the values in the two registers and stores the result in the first register 
+    def handle_xor(self, reg_a, reg_b): 
+        self.reg[reg_a] = self.reg[reg_a] ^ self.reg[reg_b] 
