@@ -2,8 +2,19 @@
 
 import sys
 
+#constants
+SP = 7 #register 7 is reserved as SP
+
 class CPU:
     """Main CPU class."""
+
+#AABCDDDD 
+#01100101 - INC alu
+#01000101 - PUSH
+#AA - number operands
+#B - alu op
+#C - sets pc
+#DDDD - instruction identifier
 
     def __init__(self):
         """Construct a new CPU."""
@@ -21,14 +32,16 @@ class CPU:
             'MUL' : 0b0010,
             'NOT' : 0b1001,
             'OR'  : 0b1010,
+            'POP' : 0b0110,
             'PRN' : 0b0111,
+            'PUSH': 0b0101,
             'SHL' : 0b1100,
             'SHR' : 0b1101,
             'SUB' : 0b0001,
             'XOR' : 0b1011
         }
         self.reg = [0] * 8 #registers on CPU
-        self.reg[7] = 0xF4 #pointer to the top of the stack
+        self.reg[SP] = 0xF4 #pointer to the top of the stack
         self.ram = [0] * 256 #memory
         self.pc = 0 #pointer counter register
         self.ir = 0 #instruction register
@@ -56,6 +69,7 @@ class CPU:
         self.branchtable[self.opcodes['MUL']] = self.handle_mul
         self.branchtable[self.opcodes['NOT']] = self.handle_not
         self.branchtable[self.opcodes['OR']]  = self.handle_or
+        self.branchtable[self.opcodes['POP']] = self.handle_pop
         self.branchtable[self.opcodes['PRN']] = self.handle_prn
         self.branchtable[self.opcodes['SHL']] = self.handle_shl
         self.branchtable[self.opcodes['SHR']] = self.handle_shr
@@ -136,19 +150,23 @@ class CPU:
         
         self.ir = self.ram[self.pc]
         
-        #get number of operands from instruction 
-        #first two bits 
-        #use and mask to clear all other bits and get the first two bits 
-        #shift so that left with just the num of operands bits 
+         
 
         
         while not self.halted:
             #gets the instruction from the memory using the address in pc 
             self.ir = self.ram[self.pc]
-            
+
+            #get number of operands from instruction 
+            #first two bits 
+             #use and mask to clear all other bits and get the first two bits 
+            #shift so that left with just the num of operands bits                
             num_operands = (self.ir & 0b11000000) >> 6
+            #get if instruction is performed by alu
             go_alu = (self.ir & 0b00100000) >> 5
+            #get if instruction sets pc
             set_pc = (self.ir & 0b00010000) >> 6 + 1
+            #get instruction identifier
             ins = (self.ir & 0b00001111)
             
             #gets as many operands as the instruction byte indicates 
@@ -164,8 +182,7 @@ class CPU:
                         
                     self.alu(op, operand_a, operand_b)
                     
-                elif ins == self.opcodes['LDI']:
-                    self.handle_ldi(operand_a, operand_b)
+                self.branchtable[ins](operand_a, operand_b)
                 
             elif num_operands == 1:
                 operand = self.ram_read(self.pc + 1)
@@ -174,11 +191,16 @@ class CPU:
                     op = ''
                     if ins == self.opcodes['DEC']:
                         op = 'DEC'
+                    if ins == self.opcodes['INC']:
+                        op = 'INC'
                         
                     self.alu(op, operand)
                 
-                if ins == self.opcodes['PRN']:
-                    self.handle_prn(operand)
+                #check if instruction identifier is push since the instruction identifier for INC and PUSh is the same
+                if ins == self.opcodes['PUSH']:
+                    self.branchtable[self.opcodes['PUSH']](operand)
+                
+                self.branchtable[ins](operand)
                 
             if ins == self.opcodes['HLT']:
                 self.handle_hlt()
@@ -243,6 +265,20 @@ class CPU:
     #preforms a bitwise OR between the values in two registers and stores the result in the first register
     def handle_or(self, reg_a, reg_b):
         self.reg[reg_a] = self.reg[reg_a] | self.reg[reg_b]
+        
+    #pops the value at the top of the stack into the given register 
+    def handle_pop(self, reg_a):
+        #copy value from address pointed to by SP to the given register
+        reg_a = self.reg[SP]
+        #increment SP
+        self.reg[SP] += 1
+        
+    #pushes the value in the given register onto the stack
+    def handle_push(self, reg_a):
+        #decrements SP by 1
+        self.reg[SP] -= 1
+        #copy value in given register to address pointed to by SP
+        self.reg[reg_a] = self.ram[self.reg[SP]]
 
     #prints numeric value stored in given register 
     def handle_prn(self, reg_a):
