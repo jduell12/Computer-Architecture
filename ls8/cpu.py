@@ -81,6 +81,7 @@ class CPU:
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
         
+        #checks if op is div or mod to make sure you aren't dividing by 0
         if op == 'DIV' or op == 'MOD':
             #sends an error message in the value in second register is 0 and halts the emulator
             if self.reg[reg_b] == 0:
@@ -88,6 +89,7 @@ class CPU:
                 self.handle_hlt()
             self.branchtable[self.opcodes[op]](reg_a, reg_b)
         
+        #check if it's one of the operations with only 1 register needed
         if op == 'INC' or op =='DEC':
             self.branchtable[self.opcodes[op]](reg_a)
         
