@@ -186,5 +186,14 @@ A | not A (~A)
     - 00: XX <-- pointer counter
 - Stack
     - Whatever is pushed last is the first thing we pop
-    1. Somplace to store data
+    1. Somplace to store data (main memory)
     2. A way to keep track of the top of the stack
+        - track index of last thing pushed
+        - we track that in the stack pointer 
+            - stack pointer = sp = R7
+    - Push
+        - decrement sp (R7)
+        - copy value from register to top of stack 
+    - Pop
+        - copy value from top of stack to register
+        - increment sp (R7)
