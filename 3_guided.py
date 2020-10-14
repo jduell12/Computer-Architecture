@@ -23,7 +23,7 @@ memory = [0] * 256
 #preset names: R0, R1, R2, R3 ... R7
 register = [0] * 8 #array of 8 0s
 register[7] = 0xf4 #stack pointer 
-
+SP = 7
 address = 0
 
 #read program data 
@@ -76,18 +76,19 @@ while not halted:
         pc += 2
     elif instruction == PUSH:
         #decrement stack pointer
-        register[7] -= 1
+        register[SP] -= 1
         reg_num = memory[pc + 1]
         value = register[reg_num]
         #puts value in given register onto the stack
-        memory[register[7]] = value
+        memory[register[SP]] = value
         pc += 2
     elif instruction == POP:
+        #top of stack addr = register 7
         #pop the value at the top of the stack onto the given register
         reg_num = memory[pc + 1]
-        register[reg_num] = memory[register[7]]
+        register[reg_num] = memory[register[SP]]
         #increment stack pointer
-        register[7] += 1
+        register[SP] += 1
         pc += 2
     else:
         print(f"Unknown instruction {instruction}")

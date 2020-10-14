@@ -28,9 +28,9 @@ class CPU:
             'XOR' : 0b1011
         }
         self.reg = [0] * 8 #registers on CPU
+        self.reg[7] = 0xF4 #pointer to the top of the stack
         self.ram = [0] * 256 #memory
         self.pc = 0 #pointer counter register
-        self.sp = 0xF4 #pointer to the top of the stack
         self.ir = 0 #instruction register
         self.mar = 0 #memory address register
         self.mdr = 0 #memory data
