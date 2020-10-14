@@ -20,13 +20,19 @@ class CPU:
         self.ir = 0 #instruction register
         self.mar = 0 #memory address register
         self.mdr = 0 #memory data
+        #flag register to hold current flags status
+        #made of 8 bits and if a particular bit is set the flag is "true"
+        # FL bits: 00000LGE
+        # L -> less-than, reg_a < reg_b
+        # G -> greater-than, reg_a > reg_b
+        # E -> equal, reg_a == reg_b
+        self.fl = 0b000000 
         self.halted = False #flag to check if running
         #sets up branch table to be able to look up instructions quickly
         self.branchtable = {}
         self.branchtable[self.opcodes['HLT']] = self.handle_hlt
         self.branchtable[self.opcodes['LDI']] = self.handle_ldi
         self.branchtable[self.opcodes['PRN']] = self.handle_prn
-        self.branchtable[self.opcodes['MUL']] = self.handle_mul
         
 
     def load(self):
@@ -61,9 +67,14 @@ class CPU:
         """ALU operations."""
 
         if op == "ADD":
+            #adds the values in the two registers together and stores the result in the first register
             self.reg[reg_a] += self.reg[reg_b]
         elif op == 'MUL': 
-            self.handle_mul(reg_a, reg_b)
+            #multiples the values in the two registers together and stores the result in the first register
+            self.reg[reg_a] *= self.reg[reg_b]
+        elif op == 'AND':
+            #performs bitwise and on the values in the two registers and stores the result in the first register
+            self.reg[reg_a] &= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -149,11 +160,7 @@ class CPU:
     def handle_prn(self, reg_a):
         #reg_a is the register number
          print(self.reg[reg_a])
-         
-    #multiples the values in the two registers together and store reult in first
-    def handle_mul(self, reg_a, reg_b):
-        self.reg[reg_a] *= self.reg[reg_b]
-    
+        
     def ram_read(self, address):
         "Accept the address to read and returns the value stored there"
         "Get the address through the pc register"
