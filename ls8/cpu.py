@@ -205,6 +205,30 @@ class CPU:
             #gets the first two bits which gives us the number of operands in the self.ir
             self.pc += num_operands + 1
             
+    #adds the values in the two registers together and stores the result in the first register        
+    def handle_add(self, reg_a, reg_b):
+        self.reg[reg_a] += self.reg[reg_b]
+
+    #performs bitwise and on the values in the two registers and stores the result in the first register
+    def handle_and(self, reg_a, reg_b):
+        self.reg[reg_a] &= self.reg[reg_b]
+        
+    #compares the values in the two registers and sets the FL register based on the comparison
+    def handle_cmp(self, reg_a, reg_b):
+        if self.reg[reg_a] > self.reg[reg_b]:
+            #set the G flag to 1 while setting E and L flags to 0 using bitwise AND
+            self.fl = self.fl & 0b00000010
+        elif self.reg[reg_a] < self.reg[reg_b]:
+            #set L flag to 1 while setting E and G flag to 0 using bitwise AND
+            self.fl = self.fl & 0b00000100
+        else:
+            #set E flag 
+            self.fl = self.fl | 0b00000001
+            
+    #subtracts 1 from the value in the given register
+    def handle_dec(self, reg_a):
+        self.reg[reg_a] -= 1
+            
     #halts the CPU and exits the emulator 
     def handle_hlt(self):
         self.halted = True
