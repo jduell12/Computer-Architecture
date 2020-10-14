@@ -13,9 +13,11 @@ class CPU:
             'AND' : 0b1000,
             'CMP' : 0b0111,
             'DEC' : 0b0110,
+            'DIV' : 0b0011, 
             'HLT' : 0b0001,
             'INC' : 0b0101,
             'LDI' : 0b0010,
+            'MOD' : 0b0100,
             'MUL' : 0b0010,
             'PRN' : 0b0111,
         }
@@ -39,9 +41,11 @@ class CPU:
         self.branchtable[self.opcodes['AND']] = self.handle_and
         self.branchtable[self.opcodes['CMP']] = self.handle_cmp
         self.branchtable[self.opcodes['DEC']] = self.handle_dec
+        self.branchtable[self.opcodes['DIV']] = self.handle_div
         self.branchtable[self.opcodes['HLT']] = self.handle_hlt
         self.branchtable[self.opcodes['INC']] = self.handle_inc
         self.branchtable[self.opcodes['LDI']] = self.handle_ldi
+        self.branchtable[self.opcodes['MOD']] = self.handle_mod
         self.branchtable[self.opcodes['MUL']] = self.handle_mul
         self.branchtable[self.opcodes['PRN']] = self.handle_prn
         
@@ -82,54 +86,16 @@ class CPU:
             if self.reg[reg_b] == 0:
                 print("You can't divide by zero. Stopping program")
                 self.handle_hlt()
-            self.branchtable[op](reg_a, reg_b)
+            self.branchtable[self.opcodes[op]](reg_a, reg_b)
         
-        if op == 'INC' or 'DEC':
-            self.branchtable[op](reg_a)
+        if op == 'INC' or op =='DEC':
+            self.branchtable[self.opcodes[op]](reg_a)
         
-        self.branchtable[op](reg_a, reg_b)
+        try:
+            self.branchtable[self.opcodes[op]](reg_a, reg_b)
+        except:
+             raise Exception("Unsupported ALU operation")
         
-        
-        if op == "ADD":
-            #adds the values in the two registers together and stores the result in the first register
-            self.reg[reg_a] += self.reg[reg_b]
-        elif op == 'MUL': 
-            #multiples the values in the two registers together and stores the result in the first register
-            self.reg[reg_a] *= self.reg[reg_b]
-        elif op == 'DIV':
-
-            #divides the value in the first register by the value in the second register and stores the result in the first register
-            self.reg[reg_a] /= self.reg[reg_b]
-        elif op == 'MOD':
-            #sends an error message in the value in second register is 0 and halts the emulator
-            if self.reg[reg_b] == 0:
-                print("You can't divide by zero. Stopping program")
-                self.handle_hlt()
-            #divides the value in the first register by the value in the second register and stores the remainder in the first register
-            self.reg[reg_a] %= self.reg[reg_b]
-        elif op == 'INC':
-            #increments the value in the given register by 1
-            self.reg[reg_a] += 1
-        elif op == 'DEC':
-            #subtracts 1 from the value in the given register
-            self.reg[reg_a] -= 1
-        elif op == 'AND':
-            #performs bitwise and on the values in the two registers and stores the result in the first register
-            self.reg[reg_a] &= self.reg[reg_b]
-        elif op == 'CMP':
-            #compares the values in the two registers and sets the FL register based on the comparison
-            if self.reg[reg_a] > self.reg[reg_b]:
-                #set the G flag to 1 while setting E and L flags to 0 using bitwise AND
-                self.fl = self.fl & 0b00000010
-            elif self.reg[reg_a] < self.reg[reg_b]:
-                #set L flag to 1 while setting E and G flag to 0 using bitwise AND
-                self.fl = self.fl & 0b00000100
-            else:
-                #set E flag 
-                self.fl = self.fl | 0b00000001
-        else:
-            raise Exception("Unsupported ALU operation")
-
     def trace(self):
         """
         Handy function to print out the CPU state. You might want to call this
@@ -228,16 +194,32 @@ class CPU:
     #subtracts 1 from the value in the given register
     def handle_dec(self, reg_a):
         self.reg[reg_a] -= 1
+        
+    #divides the value in the first register by the value in the second register and stores the result in the first register
+    def handle_div(self, reg_a, reg_b):
+        self.reg[reg_a] /= self.reg[reg_b]
             
     #halts the CPU and exits the emulator 
     def handle_hlt(self):
         self.halted = True
+        
+    #increments the value in the given register by 1
+    def handle_inc(self, reg_a):
+        self.reg[reg_a] += 1
         
     #set the value of the register to an integer 
     def handle_ldi(self, reg_a, operand_b):
         #operand_a is the register number
         #operand_b is the value to set the register to
         self.reg[reg_a] = operand_b
+
+    #divides the value in the first register by the value in the second register and stores the remainder in the first register
+    def handle_mod(self, reg_a, reg_b):
+        self.reg[reg_a] %= self.reg[reg_b]
+        
+    #multiples the values in the two registers together and stores the result in the first register
+    def handle_mul(self, reg_a, reg_b):
+        self.reg[reg_a] *= self.reg[reg_b]
 
     #prints numeric value stored in given register 
     def handle_prn(self, reg_a):
