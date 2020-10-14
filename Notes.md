@@ -184,3 +184,7 @@ A | not A (~A)
     - 02: XX
     - 01: XX
     - 00: XX <-- pointer counter
+- Stack
+    - Whatever is pushed last is the first thing we pop
+    1. Somplace to store data
+    2. A way to keep track of the top of the stack
