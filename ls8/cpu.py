@@ -20,25 +20,25 @@ class CPU:
         """Construct a new CPU."""
         #set instructions in binary using instruction idenifier
         self.opcodes = {
-            'ADD' : 0b0000,
-            'AND' : 0b1000,
-            'CMP' : 0b0111,
-            'DEC' : 0b0110,
-            'DIV' : 0b0011, 
-            'HLT' : 0b0001,
-            'INC' : 0b0101,
-            'LDI' : 0b0010,
-            'MOD' : 0b0100,
-            'MUL' : 0b0010,
-            'NOT' : 0b1001,
-            'OR'  : 0b1010,
-            'POP' : 0b0110,
-            'PRN' : 0b0111,
-            'PUSH': 0b0101,
-            'SHL' : 0b1100,
-            'SHR' : 0b1101,
-            'SUB' : 0b0001,
-            'XOR' : 0b1011
+            'ADD' : 0b10100000,
+            'AND' : 0b10101000,
+            'CMP' : 0b10100111,
+            'DEC' : 0b01100110,
+            'DIV' : 0b10100011, 
+            'HLT' : 0b00000001,
+            'INC' : 0b01100101,
+            'LDI' : 0b10000010,
+            'MOD' : 0b10100100,
+            'MUL' : 0b10100010,
+            'NOT' : 0b01101001,
+            'OR'  : 0b10101010,
+            'POP' : 0b01000110,
+            'PRN' : 0b01000111,
+            'PUSH': 0b01000101,
+            'SHL' : 0b10101100,
+            'SHR' : 0b10101101,
+            'SUB' : 0b10100001,
+            'XOR' : 0b10101011
         }
         self.reg = [0] * 8 #registers on CPU
         self.reg[SP] = 0xF4 #pointer to the top of the stack
@@ -70,6 +70,7 @@ class CPU:
         self.branchtable[self.opcodes['NOT']] = self.handle_not
         self.branchtable[self.opcodes['OR']]  = self.handle_or
         self.branchtable[self.opcodes['POP']] = self.handle_pop
+        self.branchtable[self.opcodes['PUSH']] = self.handle_push
         self.branchtable[self.opcodes['PRN']] = self.handle_prn
         self.branchtable[self.opcodes['SHL']] = self.handle_shl
         self.branchtable[self.opcodes['SHR']] = self.handle_shr
@@ -148,12 +149,11 @@ class CPU:
     def run(self):
         """Run the CPU."""
         
-        self.ir = self.ram[self.pc]
-        
-         
-
-        
         while not self.halted:
+            # print("TRACE: pc | ram_read(pc), ram_read(pc +1), ram_read(pc + 2) | registers 0-8")
+            # self.trace()
+            # print('')
+            
             #gets the instruction from the memory using the address in pc 
             self.ir = self.ram[self.pc]
 
@@ -167,7 +167,10 @@ class CPU:
             #get if instruction sets pc
             set_pc = (self.ir & 0b00010000) >> 6 + 1
             #get instruction identifier
-            ins = (self.ir & 0b00001111)
+            ins = self.ir
+            
+            # print(num_operands)
+            # print(self.opcodes[ins])
             
             #gets as many operands as the instruction byte indicates 
             if num_operands == 2:
@@ -181,6 +184,9 @@ class CPU:
                         op = 'MUL'
                         
                     self.alu(op, operand_a, operand_b)
+                    
+                if ins == self.opcodes['MUL']:
+                    self.branchtable[self.opcodes['LDI']](operand_a, operand_b)
                     
                 self.branchtable[ins](operand_a, operand_b)
                 
@@ -196,17 +202,25 @@ class CPU:
                         
                     self.alu(op, operand)
                 
-                #check if instruction identifier is push since the instruction identifier for INC and PUSh is the same
-                if ins == self.opcodes['PUSH']:
+                #check if instruction identifier is push since the instruction identifier for INC and PUSh are the same
+                if self.ir == self.opcodes['PUSH']:
                     self.branchtable[self.opcodes['PUSH']](operand)
-                
-                self.branchtable[ins](operand)
+                    
+                #check if instruction identifier is pop since the instruction identifier for DEC and POP are the same
+                elif self.ir == self.opcodes['POP']:
+                    self.branchtable[self.opcodes['POP']](operand)
+                else:
+                    self.branchtable[ins](operand)
                 
             if ins == self.opcodes['HLT']:
                 self.handle_hlt()
 
             #gets the first two bits which gives us the number of operands in the self.ir
             self.pc += num_operands + 1
+            
+            # self.trace()
+            # print('---------------------')
+            # print('')
             
     #adds the values in the two registers together and stores the result in the first register        
     def handle_add(self, reg_a, reg_b):
@@ -269,16 +283,16 @@ class CPU:
     #pops the value at the top of the stack into the given register 
     def handle_pop(self, reg_a):
         #copy value from address pointed to by SP to the given register
-        reg_a = self.reg[SP]
+        self.reg[reg_a] = self.ram[self.reg[SP]]
         #increment SP
         self.reg[SP] += 1
         
     #pushes the value in the given register onto the stack
     def handle_push(self, reg_a):
         #decrements SP by 1
-        self.reg[SP] -= 1
+        self.reg[SP] -= 1 
         #copy value in given register to address pointed to by SP
-        self.reg[reg_a] = self.ram[self.reg[SP]]
+        self.ram[self.reg[SP]] = self.reg[reg_a]
 
     #prints numeric value stored in given register 
     def handle_prn(self, reg_a):
