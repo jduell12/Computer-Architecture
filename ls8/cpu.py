@@ -2,17 +2,18 @@
 
 import sys
 
-#set instructions in binary using instruction idenifier
-HLT = 0b0001
-LDI = 0b0010
-PRN = 0b0111
-MUL = 0b0010
-
 class CPU:
     """Main CPU class."""
 
     def __init__(self):
         """Construct a new CPU."""
+        #set instructions in binary using instruction idenifier
+        self.opcodes = {
+            'HLT' : 0b0001,
+            'LDI' : 0b0010 ,
+            'PRN' : 0b0111,
+            'MUL' : 0b0010
+        }
         self.reg = [0] * 8 #registers on CPU
         self.ram = [0] * 256 #memory
         self.pc = 0 #pointer counter register
@@ -22,10 +23,10 @@ class CPU:
         self.halted = False #flag to check if running
         #sets up branch table to be able to look up instructions quickly
         self.branchtable = {}
-        self.branchtable[HLT] = self.handle_hlt
-        self.branchtable[LDI] = self.handle_ldi
-        self.branchtable[PRN] = self.handle_prn
-        self.branchtable[MUL] = self.handle_mul
+        self.branchtable[self.opcodes['HLT']] = self.handle_hlt
+        self.branchtable[self.opcodes['LDI']] = self.handle_ldi
+        self.branchtable[self.opcodes['PRN']] = self.handle_prn
+        self.branchtable[self.opcodes['MUL']] = self.handle_mul
         
 
     def load(self):
@@ -62,7 +63,7 @@ class CPU:
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
         elif op == 'MUL': 
-            pass
+            self.handle_mul(reg_a, reg_b)
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -101,8 +102,8 @@ class CPU:
             #gets the instruction from the memory using the address in pc 
             self.ir = self.ram[self.pc]
             
-            num_operands = (self.ir & 0b11000000) >> 5 + 1
-            go_alu = (self.ir & 0b00100000) >> 6 + 1
+            num_operands = (self.ir & 0b11000000) >> 6
+            go_alu = (self.ir & 0b00100000) >> 5
             set_pc = (self.ir & 0b00010000) >> 6 + 1
             ins = (self.ir & 0b00001111)
             
@@ -112,13 +113,23 @@ class CPU:
                 operand_a = self.ram_read(self.pc + 1)
                 operand_b = self.ram_read(self.pc + 2)
                 
-                print(operand_a, operand_b)
-            elif num_operands == 1:
-                operand_a = self.ram_read(self.pc + 1)
+                if bool(go_alu):
+                    op = ""
+                    if ins == self.opcodes['MUL']:
+                        op = 'MUL'
+                        
+                    self.alu(op, operand_a, operand_b)
+                    
+                elif ins == self.opcodes['LDI']:
+                    self.handle_ldi(operand_a, operand_b)
                 
-                print(operand_a)                
-            
-            if ins == HLT:
+            elif num_operands == 1:
+                operand = self.ram_read(self.pc + 1)
+                
+                if ins == self.opcodes['PRN']:
+                    self.handle_prn(operand)
+                
+            if ins == self.opcodes['HLT']:
                 self.handle_hlt()
 
             #gets the first two bits which gives us the number of operands in the self.ir
