@@ -9,10 +9,15 @@ class CPU:
         """Construct a new CPU."""
         #set instructions in binary using instruction idenifier
         self.opcodes = {
+            'ADD' : 0b0000,
+            'AND' : 0b1000,
+            'CMP' : 0b0111,
+            'DEC' : 0b0110,
             'HLT' : 0b0001,
-            'LDI' : 0b0010 ,
+            'INC' : 0b0101,
+            'LDI' : 0b0010,
+            'MUL' : 0b0010,
             'PRN' : 0b0111,
-            'MUL' : 0b0010
         }
         self.reg = [0] * 8 #registers on CPU
         self.ram = [0] * 256 #memory
@@ -30,8 +35,14 @@ class CPU:
         self.halted = False #flag to check if running
         #sets up branch table to be able to look up instructions quickly
         self.branchtable = {}
+        self.branchtable[self.opcodes['ADD']] = self.handle_add
+        self.branchtable[self.opcodes['AND']] = self.handle_and
+        self.branchtable[self.opcodes['CMP']] = self.handle_cmp
+        self.branchtable[self.opcodes['DEC']] = self.handle_dec
         self.branchtable[self.opcodes['HLT']] = self.handle_hlt
+        self.branchtable[self.opcodes['INC']] = self.handle_inc
         self.branchtable[self.opcodes['LDI']] = self.handle_ldi
+        self.branchtable[self.opcodes['MUL']] = self.handle_mul
         self.branchtable[self.opcodes['PRN']] = self.handle_prn
         
 
@@ -65,17 +76,48 @@ class CPU:
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
-
+        
+        if op == 'DIV' or op == 'MOD':
+            #sends an error message in the value in second register is 0 and halts the emulator
+            if self.reg[reg_b] == 0:
+                print("You can't divide by zero. Stopping program")
+                self.handle_hlt()
+            self.branchtable[op](reg_a, reg_b)
+        
+        if op == 'INC' or 'DEC':
+            self.branchtable[op](reg_a)
+        
+        self.branchtable[op](reg_a, reg_b)
+        
+        
         if op == "ADD":
             #adds the values in the two registers together and stores the result in the first register
             self.reg[reg_a] += self.reg[reg_b]
         elif op == 'MUL': 
             #multiples the values in the two registers together and stores the result in the first register
             self.reg[reg_a] *= self.reg[reg_b]
+        elif op == 'DIV':
+
+            #divides the value in the first register by the value in the second register and stores the result in the first register
+            self.reg[reg_a] /= self.reg[reg_b]
+        elif op == 'MOD':
+            #sends an error message in the value in second register is 0 and halts the emulator
+            if self.reg[reg_b] == 0:
+                print("You can't divide by zero. Stopping program")
+                self.handle_hlt()
+            #divides the value in the first register by the value in the second register and stores the remainder in the first register
+            self.reg[reg_a] %= self.reg[reg_b]
+        elif op == 'INC':
+            #increments the value in the given register by 1
+            self.reg[reg_a] += 1
+        elif op == 'DEC':
+            #subtracts 1 from the value in the given register
+            self.reg[reg_a] -= 1
         elif op == 'AND':
             #performs bitwise and on the values in the two registers and stores the result in the first register
             self.reg[reg_a] &= self.reg[reg_b]
         elif op == 'CMP':
+            #compares the values in the two registers and sets the FL register based on the comparison
             if self.reg[reg_a] > self.reg[reg_b]:
                 #set the G flag to 1 while setting E and L flags to 0 using bitwise AND
                 self.fl = self.fl & 0b00000010
@@ -146,6 +188,13 @@ class CPU:
                 
             elif num_operands == 1:
                 operand = self.ram_read(self.pc + 1)
+                
+                if bool(go_alu):
+                    op = ''
+                    if ins == self.opcodes['DEC']:
+                        op = 'DEC'
+                        
+                    self.alu(op, operand)
                 
                 if ins == self.opcodes['PRN']:
                     self.handle_prn(operand)
