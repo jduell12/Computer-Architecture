@@ -75,6 +75,16 @@ class CPU:
         elif op == 'AND':
             #performs bitwise and on the values in the two registers and stores the result in the first register
             self.reg[reg_a] &= self.reg[reg_b]
+        elif op == 'CMP':
+            if self.reg[reg_a] > self.reg[reg_b]:
+                #set the G flag to 1 while setting E and L flags to 0 using bitwise AND
+                self.fl = self.fl & 0b00000010
+            elif self.reg[reg_a] < self.reg[reg_b]:
+                #set L flag to 1 while setting E and G flag to 0 using bitwise AND
+                self.fl = self.fl & 0b00000100
+            else:
+                #set E flag 
+                self.fl = self.fl | 0b00000001
         else:
             raise Exception("Unsupported ALU operation")
 
