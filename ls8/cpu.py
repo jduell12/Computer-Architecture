@@ -115,7 +115,6 @@ class CPU:
             if self.reg[reg_b] == 0:
                 print("You can't divide by zero. Stopping program")
                 self.handle_hlt()
-            self.branchtable[self.opcodes[op]](reg_a, reg_b)
         
         #check if it's one of the operations with only 1 register needed
         if op == 'INC' or op =='DEC' or op == 'NOT':
@@ -150,16 +149,13 @@ class CPU:
         """Run the CPU."""
         
         while not self.halted:
-            # print("TRACE: pc | ram_read(pc), ram_read(pc +1), ram_read(pc + 2) | registers 0-8")
-            # self.trace()
-            # print('')
             
             #gets the instruction from the memory using the address in pc 
             self.ir = self.ram[self.pc]
 
             #get number of operands from instruction 
             #first two bits 
-             #use and mask to clear all other bits and get the first two bits 
+            #use and mask to clear all other bits and get the first two bits 
             #shift so that left with just the num of operands bits                
             num_operands = (self.ir & 0b11000000) >> 6
             #get if instruction is performed by alu
@@ -169,8 +165,6 @@ class CPU:
             #get instruction identifier
             ins = self.ir
             
-            # print(num_operands)
-            # print(self.opcodes[ins])
             
             #gets as many operands as the instruction byte indicates 
             if num_operands == 2:
@@ -184,11 +178,8 @@ class CPU:
                         op = 'MUL'
                         
                     self.alu(op, operand_a, operand_b)
-                    
-                if ins == self.opcodes['MUL']:
-                    self.branchtable[self.opcodes['LDI']](operand_a, operand_b)
-                    
-                self.branchtable[ins](operand_a, operand_b)
+                else:    
+                    self.branchtable[ins](operand_a, operand_b)
                 
             elif num_operands == 1:
                 operand = self.ram_read(self.pc + 1)
@@ -218,9 +209,6 @@ class CPU:
             #gets the first two bits which gives us the number of operands in the self.ir
             self.pc += num_operands + 1
             
-            # self.trace()
-            # print('---------------------')
-            # print('')
             
     #adds the values in the two registers together and stores the result in the first register        
     def handle_add(self, reg_a, reg_b):
