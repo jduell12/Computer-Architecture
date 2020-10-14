@@ -2,11 +2,11 @@
 
 import sys
 
-#set instructions in binary
-HLT = 0b00000001
-LDI = 0b10000010
-PRN = 0b01000111
-MUL = 0b10100010
+#set instructions in binary using instruction idenifier
+HLT = 0b0001
+LDI = 0b0010
+PRN = 0b0111
+MUL = 0b0010
 
 class CPU:
     """Main CPU class."""
@@ -89,19 +89,41 @@ class CPU:
     def run(self):
         """Run the CPU."""
         
+        self.ir = self.ram[self.pc]
+        
+        #get number of operands from instruction 
+        #first two bits 
+        #use and mask to clear all other bits and get the first two bits 
+        #shift so that left with just the num of operands bits 
+
+        
         while not self.halted:
             #gets the instruction from the memory using the address in pc 
             self.ir = self.ram[self.pc]
             
-            #gets the next 2 bytes of data to use in case the instruction needs the next bytes in order to perform the instruction
-            operand_a = self.ram_read(self.pc + 1)
-            operand_b = self.ram_read(self.pc + 2)
+            num_operands = (self.ir & 0b11000000) >> 5 + 1
+            go_alu = (self.ir & 0b00100000) >> 6 + 1
+            set_pc = (self.ir & 0b00010000) >> 6 + 1
+            ins = (self.ir & 0b00001111)
             
+            #gets as many operands as the instruction byte indicates 
+            if num_operands == 2:
+                #gets the next 2 bytes of data to use in case the instruction needs the next bytes in order to perform the instruction
+                operand_a = self.ram_read(self.pc + 1)
+                operand_b = self.ram_read(self.pc + 2)
+                
+                print(operand_a, operand_b)
+            elif num_operands == 1:
+                operand_a = self.ram_read(self.pc + 1)
+                
+                print(operand_a)                
+            
+            if ins == HLT:
+                self.handle_hlt()
 
             #gets the first two bits which gives us the number of operands in the self.ir
-            instruction_length = ((self.ir & 0b11000000) >> 6) + 1
-            self.pc += instruction_length
-    
+            self.pc += num_operands + 1
+            
     #halts the CPU and exits the emulator 
     def handle_hlt(self):
         self.halted = True
