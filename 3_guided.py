@@ -8,6 +8,8 @@ PRINT_BEEJ = 1
 HALT = 2
 SAVE_REG = 3
 PRINT_REG = 4
+PUSH = 5 
+POP = 6
 
 #holds bytes 
 #change so that instruction is no longer hardcoded 
@@ -20,6 +22,7 @@ memory = [0] * 256
 #registers 
 #preset names: R0, R1, R2, R3 ... R7
 register = [0] * 8 #array of 8 0s
+register[7] = 0xf4 #stack pointer 
 
 address = 0
 
@@ -70,6 +73,21 @@ while not halted:
     elif instruction == PRINT_REG: #PRINT_REG
         reg_num = memory[pc + 1]
         print(register[reg_num])
+        pc += 2
+    elif instruction == PUSH:
+        #decrement stack pointer
+        register[7] -= 1
+        reg_num = memory[pc + 1]
+        value = register[reg_num]
+        #puts value in given register onto the stack
+        memory[register[7]] = value
+        pc += 2
+    elif instruction == POP:
+        #pop the value at the top of the stack onto the given register
+        reg_num = memory[pc + 1]
+        register[reg_num] = memory[register[7]]
+        #increment stack pointer
+        register[7] += 1
         pc += 2
     else:
         print(f"Unknown instruction {instruction}")
