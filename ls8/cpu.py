@@ -8,6 +8,8 @@ IM = 5 #register R5 is reserved as IM
 IS = 6 #register R6 is reserved as IS
 SP = 7 #register R7 is reserved as SP
 
+
+
 class CPU:
     """Main CPU class."""
 
@@ -18,6 +20,7 @@ class CPU:
 #DDDD - instruction identifier
 
     def __init__(self):
+        self.counter = 0
         """Construct a new CPU."""
         #set instructions in binary using instruction idenifier
         self.opcodes = {
@@ -183,16 +186,16 @@ class CPU:
     def run(self):
         """Run the CPU."""
         #starts timing
-        start = time.time()
+        # start = time.time()
         
         while not self.halted:
             
             #checks if a second has elapsed
-            end = time.time()
-            elapsed = end - start 
+            # end = time.time()
+            # elapsed = end - start 
             
-            if elapsed >= 0.01:
-                break
+            # if elapsed >= 0.01:
+            #     break
             #     #set the IS register to notify of an interrupt occuring
             #     self.reg[IS] = 0
             #     start = time.time()
@@ -216,6 +219,7 @@ class CPU:
             #get instruction identifier
             ins = self.ir
             
+
             # print(self.lookUpOpcodes[ins])
             # self.trace()
 
@@ -238,17 +242,22 @@ class CPU:
                 if bool(go_alu):
                     op = op = self.lookUpOpcodes[ins]    
                     self.alu(op, operand)
-
-                self.branchtable[ins](operand)
+                else:
+                    self.branchtable[ins](operand)
             else:
                 self.branchtable[ins]()
 
             #gets the first two bits which gives us the number of operands in the self.ir
             if not bool(set_pc):
                 self.pc += num_operands + 1
-                
+            
+            self.counter += 1
+            
             # self.trace()
             # print('--------------')
+            
+            # if self.counter > 134:
+            #     break
             
 
     ############## functions for each instruction in spec ####################            
@@ -272,6 +281,9 @@ class CPU:
         
     #compares the values in the two registers and sets the FL register based on the comparison
     def handle_cmp(self, reg_a, reg_b):
+        # if self.counter > 130:
+        #     print('before self.fl', bin(self.fl))
+        
         if self.reg[reg_a] > self.reg[reg_b]:
             #set the G flag to 1 while setting E and L flags to 0 using bitwise AND
             self.fl = self.fl | 0b00000010
@@ -280,9 +292,11 @@ class CPU:
             self.fl = self.fl | 0b00000100
         else:
             #set E flag 
+            self.fl = self.fl & 0b00000000
             self.fl = self.fl | 0b00000001
             
-        # print(bin(self.fl))
+        # if self.counter > 130:
+        #     print(bin(self.fl))
             
     #subtracts 1 from the value in the given register
     def handle_dec(self, reg_a):
@@ -319,13 +333,9 @@ class CPU:
     def handle_jeq(self, reg_a):
         #get equal bit from flag byte
         equal = self.fl & 0b11111111
-
-        # print('equal', bin(equal))
-        # print('greater',bin(0b00000001))
         
         #set pc to address stored in the register
         if bin(equal) == bin(0b00000001):
-            # print(equal)
             #use jmp function
             self.handle_jmp(reg_a)
         else:
@@ -430,7 +440,7 @@ class CPU:
     #print alpha character value stored in the given registiver 
     def handle_pra(self, reg_a):
         #reg_a is the register number 
-        print(chr(self.reg[reg_a]), end="")
+        print(chr(self.ram[self.reg[reg_a]]), end="")
 
     #prints numeric value stored in given register 
     def handle_prn(self, reg_a):
