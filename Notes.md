@@ -230,9 +230,9 @@ A | not A (~A)
 - Like simple functions 
     - no function arguments
     - no return values 
-    - when we call a function
+    - when we call a function (CALL)
         - push the return address on the stack
         - set the pc to the function address 
-    - when we return 
+    - when we return (RET)
         - pop the return address off the stack, store it in the pc 
     - 
