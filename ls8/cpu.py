@@ -30,8 +30,10 @@ class CPU:
             'MOD' : 0b10100100,
             'MUL' : 0b10100010,
             'NOT' : 0b01101001,
+            'NOP' : 0b00000000,
             'OR'  : 0b10101010,
             'POP' : 0b01000110,
+            'PRA' : 0b01001000,
             'PRN' : 0b01000111,
             'PUSH': 0b01000101,
             'RET' : 0b00010001,
@@ -40,6 +42,7 @@ class CPU:
             'SUB' : 0b10100001,
             'XOR' : 0b10101011
         }
+        self.lookUpOpcodes = dict(map(reversed, self.opcodes.items()))
         self.reg = [0] * 8 #registers on CPU
         self.reg[SP] = 0xF4 #pointer to the top of the stack
         self.ram = [0] * 256 #memory
@@ -69,9 +72,11 @@ class CPU:
         self.branchtable[self.opcodes['MOD']] = self.handle_mod
         self.branchtable[self.opcodes['MUL']] = self.handle_mul
         self.branchtable[self.opcodes['NOT']] = self.handle_not
+        self.branchtable[self.opcodes['NOP']] = self.handle_nop
         self.branchtable[self.opcodes['OR']]  = self.handle_or
         self.branchtable[self.opcodes['POP']] = self.handle_pop
         self.branchtable[self.opcodes['PUSH']] = self.handle_push
+        self.branchtable[self.opcodes['PRA']] = self.handle_pra
         self.branchtable[self.opcodes['PRN']] = self.handle_prn
         self.branchtable[self.opcodes['RET']] = self.handle_ret
         self.branchtable[self.opcodes['SHL']] = self.handle_shl
@@ -173,16 +178,7 @@ class CPU:
                 operand_b = self.ram_read(self.pc + 2)
                 
                 if bool(go_alu):
-                    op = ""
-                    if ins == self.opcodes['ADD']:
-                        op = 'ADD'
-                    elif ins == self.opcodes['AND']:
-                        op = 'AND'
-                    elif ins == self.opcodes['CMP']:
-                        op = 'CMP'
-                    elif ins == self.opcodes['MUL']:
-                        op = 'MUL'
-                        
+                    op = self.lookUpOpcodes[ins]
                     self.alu(op, operand_a, operand_b)
                 else:    
                     self.branchtable[ins](operand_a, operand_b)
@@ -191,12 +187,7 @@ class CPU:
                 operand = self.ram_read(self.pc + 1)
                 
                 if bool(go_alu):
-                    op = ''
-                    if ins == self.opcodes['DEC']:
-                        op = 'DEC'
-                    if ins == self.opcodes['INC']:
-                        op = 'INC'
-                        
+                    op = op = self.lookUpOpcodes[ins]    
                     self.alu(op, operand)
 
                 self.branchtable[ins](operand)
@@ -207,7 +198,9 @@ class CPU:
             if not bool(set_pc):
                 self.pc += num_operands + 1
             
-            
+
+    ############## functions for each instruction in spec ####################            
+
     #adds the values in the two registers together and stores the result in the first register        
     def handle_add(self, reg_a, reg_b):
         self.reg[reg_a] += self.reg[reg_b]
@@ -267,6 +260,10 @@ class CPU:
     def handle_mul(self, reg_a, reg_b):
         self.reg[reg_a] *= self.reg[reg_b]
         
+    #do nothing 
+    def handle_nop(self):
+        return
+        
     #perform a bitwise NOT on the value in the given register and store the result in the same register
     def handle_not(self, reg_a):
         self.reg[reg_a] = ~self.reg[reg_a]
@@ -282,17 +279,22 @@ class CPU:
         #increment SP
         self.reg[SP] += 1
         
+    #print alpha character value stored in the given registiver 
+    def handle_pra(self, reg_a):
+        #reg_a is the register number 
+        print(chr(self.reg[reg_a]))
+
+    #prints numeric value stored in given register 
+    def handle_prn(self, reg_a):
+        #reg_a is the register number
+         print(self.reg[reg_a])
+         
     #pushes the value in the given register onto the stack
     def handle_push(self, reg_a):
         #decrements SP by 1
         self.reg[SP] -= 1 
         #copy value in given register to address pointed to by SP
         self.ram[self.reg[SP]] = self.reg[reg_a]
-
-    #prints numeric value stored in given register 
-    def handle_prn(self, reg_a):
-        #reg_a is the register number
-         print(self.reg[reg_a])
          
     #returns from the subroutine
     def handle_ret(self):
@@ -317,6 +319,8 @@ class CPU:
     def handle_xor(self, reg_a, reg_b): 
         self.reg[reg_a] = self.reg[reg_a] ^ self.reg[reg_b] 
         
+        
+    ######### helper functions #########################
     def ram_read(self, address):
         "Accept the address to read and returns the value stored there"
         "Get the address through the pc register"
@@ -329,7 +333,6 @@ class CPU:
         # self.ram[self.mar] = self.mdr
         self.ram[self.pc] = value
         
-    #helper functions 
     def push_val(self, value):
         #decrement the stack pointer
         self.reg[SP] -= 1
