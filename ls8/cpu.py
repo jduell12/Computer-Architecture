@@ -59,30 +59,31 @@ class CPU:
         self.fl = 0b000000 
         self.halted = False #flag to check if running
         #sets up branch table to be able to look up instructions quickly
-        self.branchtable = {}
-        self.branchtable[self.opcodes['ADD']] = self.handle_add
-        self.branchtable[self.opcodes['AND']] = self.handle_and
-        self.branchtable[self.opcodes['CALL']] = self.handle_call
-        self.branchtable[self.opcodes['CMP']] = self.handle_cmp
-        self.branchtable[self.opcodes['DEC']] = self.handle_dec
-        self.branchtable[self.opcodes['DIV']] = self.handle_div
-        self.branchtable[self.opcodes['HLT']] = self.handle_hlt
-        self.branchtable[self.opcodes['INC']] = self.handle_inc
-        self.branchtable[self.opcodes['LDI']] = self.handle_ldi
-        self.branchtable[self.opcodes['MOD']] = self.handle_mod
-        self.branchtable[self.opcodes['MUL']] = self.handle_mul
-        self.branchtable[self.opcodes['NOT']] = self.handle_not
-        self.branchtable[self.opcodes['NOP']] = self.handle_nop
-        self.branchtable[self.opcodes['OR']]  = self.handle_or
-        self.branchtable[self.opcodes['POP']] = self.handle_pop
-        self.branchtable[self.opcodes['PUSH']] = self.handle_push
-        self.branchtable[self.opcodes['PRA']] = self.handle_pra
-        self.branchtable[self.opcodes['PRN']] = self.handle_prn
-        self.branchtable[self.opcodes['RET']] = self.handle_ret
-        self.branchtable[self.opcodes['SHL']] = self.handle_shl
-        self.branchtable[self.opcodes['SHR']] = self.handle_shr
-        self.branchtable[self.opcodes['SUB']] = self.handle_sub 
-        self.branchtable[self.opcodes['XOR']] = self.handle_xor 
+        self.branchtable = {
+            self.opcodes['ADD']: self.handle_add,
+            self.opcodes['AND']: self.handle_and,
+            self.opcodes['CALL']: self.handle_call, 
+            self.opcodes['CMP']: self.handle_cmp,
+            self.opcodes['DEC']: self.handle_dec,
+            self.opcodes['DIV']: self.handle_div,
+            self.opcodes['HLT']: self.handle_hlt,
+            self.opcodes['INC']: self.handle_inc,
+            self.opcodes['LDI']: self.handle_ldi,
+            self.opcodes['MOD']: self.handle_mod,
+            self.opcodes['MUL']: self.handle_mul,
+            self.opcodes['NOT']: self.handle_not,
+            self.opcodes['NOP']: self.handle_nop,
+            self.opcodes['OR']: self.handle_or,
+            self.opcodes['POP']: self.handle_pop,
+            self.opcodes['PUSH']: self.handle_push,
+            self.opcodes['PRA']: self.handle_pra,
+            self.opcodes['PRN']: self.handle_prn,
+            self.opcodes['RET']: self.handle_ret,
+            self.opcodes['SHL']: self.handle_shl,
+            self.opcodes['SHR']: self.handle_shr,
+            self.opcodes['SUB']: self.handle_sub,
+            self.opcodes['XOR']: self.handle_xor 
+        }
         
 
     def load(self):
