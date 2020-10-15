@@ -1,6 +1,7 @@
 """CPU functionality."""
 
 import sys
+import time #to use for timer interrupts 
 
 #constants
 IM = 5 #register R5 is reserved as IM
@@ -57,7 +58,7 @@ class CPU:
         self.lookUpOpcodes = dict(map(reversed, self.opcodes.items()))
         self.reg = [0] * 8 #registers on CPU
         self.reg[IM] = 0 #interrupt mask (IM)
-        self.reg[IS] = 0 #interrupt status (IS)
+        self.reg[IS] = -1 #interrupt status (IS)
         self.reg[SP] = 0xF4 #pointer to the top of the stack, SP
         self.ram = [0] * 256 #memory
         self.pc = 0 #pointer counter register
@@ -72,6 +73,9 @@ class CPU:
         # E -> equal, reg_a == reg_b
         self.fl = 0b000000 
         self.halted = False #flag to check if running
+        self.interrupt_7 = 0xFF
+        self.interrupt_0 = 0xF8
+        self.key_pressed = 0XF4
         #sets up branch table to be able to look up instructions quickly
         self.branchtable = {
             self.opcodes['ADD']: self.handle_add,
@@ -179,8 +183,24 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
+        #starts timing
+        start = time.time()
         
         while not self.halted:
+            
+            #checks if a second has elapsed
+            end = time.time()
+            elapsed = end - start 
+            
+            if elapsed >= 1:
+                #set the IS register to notify of an interrupt occuring
+                self.reg[IS] = 0
+                start = time.time()
+            
+            #checks if interupt occurred 
+            if self.reg[IS] >= 0 or self.reg[IS] < 8:
+                print('interupted')
+            
             #gets the instruction from the memory using the address in pc 
             self.ir = self.ram[self.pc]
 
