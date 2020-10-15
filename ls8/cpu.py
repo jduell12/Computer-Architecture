@@ -3,14 +3,12 @@
 import sys
 
 #constants
-SP = 7 #register 7 is reserved as SP
+SP = 7 #register R7 is reserved as SP
 
 class CPU:
     """Main CPU class."""
 
-#AABCDDDD 
-#01100101 - INC alu
-#01000101 - PUSH
+#Instruction byte: AABCDDDD 
 #AA - number operands
 #B - alu op
 #C - sets pc
