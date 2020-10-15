@@ -10,6 +10,8 @@ SAVE_REG = 3
 PRINT_REG = 4
 PUSH = 5 
 POP = 6
+CALL = 7
+RET = 8
 
 #holds bytes 
 #change so that instruction is no longer hardcoded 
@@ -54,6 +56,23 @@ except FileNotFoundError:
 #keep track of the address of the currently-executing instruction 
 pc = 0 #program counter, pointer to instruction being executed 
 
+#helper function to push on the stack
+def push_val(value):
+	# Decrement the stack pointer
+	register[SP] -= 1
+	# Copy the value onto the stack
+	top_of_stack_addr = register[SP]
+	memory[top_of_stack_addr] = value
+    
+#helper function to pop off the stadck
+def pop_val():
+    # Get value from top of stack
+    top_of_stack_addr = register[SP]
+    value = memory[top_of_stack_addr] # Want to put this in a reg
+    # Increment the SP
+    register[SP] += 1
+    return value
+ 
 halted = False #flag check if program is halted
 
 while not halted:
@@ -90,6 +109,18 @@ while not halted:
         #increment stack pointer
         register[SP] += 1
         pc += 2
+    elif instruction == CALL:
+        #address of instruction directly after call is pushed to the stack
+        return_addr = pc + 2
+        push_val(return_addr)
+        #pc is set to the address stored in the given register 
+        reg_num = memory[pc + 1]
+        subroutine_addr = register[reg_num]
+        pc = subroutine_addr
+    elif instruction == RET:
+        #Pop the value from the top of the stack and store it in the PC.
+        return_addr = pop_val()
+        pc = return_addr
     else:
         print(f"Unknown instruction {instruction}")
         sys.exit(1)

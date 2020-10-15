@@ -225,3 +225,14 @@ A | not A (~A)
     - Pop
         - copy value from top of stack to register
         - increment sp (R7)
+
+# Subroutines
+- Like simple functions 
+    - no function arguments
+    - no return values 
+    - when we call a function
+        - push the return address on the stack
+        - set the pc to the function address 
+    - when we return 
+        - pop the return address off the stack, store it in the pc 
+    - 
