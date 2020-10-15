@@ -3,6 +3,8 @@
 import sys
 
 #constants
+IM = 5 #register R5 is reserved as IM
+IS = 6 #register R6 is reserved as IS
 SP = 7 #register R7 is reserved as SP
 
 class CPU:
@@ -26,6 +28,7 @@ class CPU:
             'DIV' : 0b10100011, 
             'HLT' : 0b00000001,
             'INC' : 0b01100101,
+            'INT' : 0b01010010,
             'LDI' : 0b10000010,
             'MOD' : 0b10100100,
             'MUL' : 0b10100010,
@@ -39,12 +42,15 @@ class CPU:
             'RET' : 0b00010001,
             'SHL' : 0b10101100,
             'SHR' : 0b10101101,
+            'ST'  : 0b10000100, 
             'SUB' : 0b10100001,
             'XOR' : 0b10101011
         }
         self.lookUpOpcodes = dict(map(reversed, self.opcodes.items()))
         self.reg = [0] * 8 #registers on CPU
-        self.reg[SP] = 0xF4 #pointer to the top of the stack
+        self.reg[IM] = 0 #interrupt mask (IM)
+        self.reg[IS] = 0 #interrupt status (IS)
+        self.reg[SP] = 0xF4 #pointer to the top of the stack, SP
         self.ram = [0] * 256 #memory
         self.pc = 0 #pointer counter register
         self.ir = 0 #instruction register
@@ -68,6 +74,7 @@ class CPU:
             self.opcodes['DIV']: self.handle_div,
             self.opcodes['HLT']: self.handle_hlt,
             self.opcodes['INC']: self.handle_inc,
+            self.opcodes['INT']: self.handle_int,
             self.opcodes['LDI']: self.handle_ldi,
             self.opcodes['MOD']: self.handle_mod,
             self.opcodes['MUL']: self.handle_mul,
@@ -81,6 +88,7 @@ class CPU:
             self.opcodes['RET']: self.handle_ret,
             self.opcodes['SHL']: self.handle_shl,
             self.opcodes['SHR']: self.handle_shr,
+            self.opcodes['ST'] : self.handle_st,
             self.opcodes['SUB']: self.handle_sub,
             self.opcodes['XOR']: self.handle_xor 
         }
@@ -247,6 +255,21 @@ class CPU:
     def handle_inc(self, reg_a):
         self.reg[reg_a] += 1
         
+    #issues the interrupt number that is stored in the given register    
+    def handle_int(self, reg_a):
+        self.reg[IS] = self.reg(reg_a)
+        
+    #returns from the interrupt handler 
+    def handle_iret(self):
+        #registers R6-R0 are pooped off the stack in that order
+        for i in range(6, -1, -1):
+            self.reg[i] = self.pop_val()
+        #fl register is popped off the stack
+        self.fl = self.pop_val()
+        self.pc = self.pop_val()
+        #re-enables interrupts
+        self.reg[IS] = 0
+        
     #set the value of the register to an integer 
     def handle_ldi(self, reg_a, operand_b):
         #operand_a is the register number
@@ -311,6 +334,12 @@ class CPU:
     #shifts the value in the first register by the of bits specified in the second register to the right
     def handle_shr(self, reg_a, reg_b):
         self.reg[reg_a] = self.reg[reg_a] >> self.reg[reg_b] 
+        
+    #store value in second register in the address stored in first register
+    def handle_st(self, reg_a, reg_b):
+        value = self.reg[reg_b]
+        address = self.reg[reg_a]
+        self.ram[address] = value
         
     #subtracts the value in the first register by the value in the second register and stores the result in the first register
     def handle_sub(self, reg_a, reg_b):
