@@ -235,4 +235,9 @@ A | not A (~A)
         - set the pc to the function address 
     - when we return (RET)
         - pop the return address off the stack, store it in the pc 
-    - 
+    
+# Interrupts 
+- similar to callbacks in JS 
+- have these for hardware that behaves slower than the CPU 
+- allows CPU to pause and handle interrupt and then continue it's work 
+- typically OS is the handler for interrupts on normal machines 
