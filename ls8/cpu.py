@@ -142,7 +142,7 @@ class CPU:
             sys.exit(2)
 
 
-    def alu(self, op, reg_a, reg_b):
+    def alu(self, op, reg_a, reg_b=None):
         """ALU operations."""
         
         #checks if op is div or mod to make sure you aren't dividing by 0
@@ -153,13 +153,13 @@ class CPU:
                 self.handle_hlt()
         
         #check if it's one of the operations with only 1 register needed
-        if op == 'INC' or op =='DEC' or op == 'NOT':
+        elif op == 'INC' or op =='DEC' or op == 'NOT':
             self.branchtable[self.opcodes[op]](reg_a)
-        
-        try:
-            self.branchtable[self.opcodes[op]](reg_a, reg_b)
-        except:
-             raise Exception("Unsupported ALU operation")
+        else:
+            try:
+                self.branchtable[self.opcodes[op]](reg_a, reg_b)
+            except:
+                raise Exception("Unsupported ALU operation")
         
     def trace(self):
         """
@@ -178,7 +178,6 @@ class CPU:
 
         for i in range(8):
             print(" %02X" % self.reg[i], end='')
-
         print()
 
     def run(self):
@@ -192,14 +191,15 @@ class CPU:
             end = time.time()
             elapsed = end - start 
             
-            if elapsed >= 1:
-                #set the IS register to notify of an interrupt occuring
-                self.reg[IS] = 0
-                start = time.time()
+            if elapsed >= 0.01:
+                break
+            #     #set the IS register to notify of an interrupt occuring
+            #     self.reg[IS] = 0
+            #     start = time.time()
             
             #checks if interupt occurred 
-            if self.reg[IS] >= 0 or self.reg[IS] < 8:
-                print('interupted')
+            # if self.reg[IS] >= 0 or self.reg[IS] < 8:
+            #     print('interupted')
             
             #gets the instruction from the memory using the address in pc 
             self.ir = self.ram[self.pc]
@@ -215,6 +215,10 @@ class CPU:
             set_pc = (self.ir & 0b00010000) >> 4 
             #get instruction identifier
             ins = self.ir
+            
+            # print(self.lookUpOpcodes[ins])
+            # self.trace()
+
             
             #gets as many operands as the instruction byte indicates 
             if num_operands == 2:
@@ -242,6 +246,9 @@ class CPU:
             #gets the first two bits which gives us the number of operands in the self.ir
             if not bool(set_pc):
                 self.pc += num_operands + 1
+                
+            # self.trace()
+            # print('--------------')
             
 
     ############## functions for each instruction in spec ####################            
@@ -267,13 +274,15 @@ class CPU:
     def handle_cmp(self, reg_a, reg_b):
         if self.reg[reg_a] > self.reg[reg_b]:
             #set the G flag to 1 while setting E and L flags to 0 using bitwise AND
-            self.fl = self.fl & 0b00000010
+            self.fl = self.fl | 0b00000010
         elif self.reg[reg_a] < self.reg[reg_b]:
             #set L flag to 1 while setting E and G flag to 0 using bitwise AND
-            self.fl = self.fl & 0b00000100
+            self.fl = self.fl | 0b00000100
         else:
             #set E flag 
             self.fl = self.fl | 0b00000001
+            
+        # print(bin(self.fl))
             
     #subtracts 1 from the value in the given register
     def handle_dec(self, reg_a):
@@ -310,10 +319,17 @@ class CPU:
     def handle_jeq(self, reg_a):
         #get equal bit from flag byte
         equal = self.fl & 0b11111111
+
+        # print('equal', bin(equal))
+        # print('greater',bin(0b00000001))
+        
         #set pc to address stored in the register
-        if equal:
+        if bin(equal) == bin(0b00000001):
+            # print(equal)
             #use jmp function
             self.handle_jmp(reg_a)
+        else:
+            self.pc += 2
     
     #if greater than flag or equal flag is set to true, jump to the address stored in the given register
     def handle_jge(self, reg_a):
@@ -373,8 +389,10 @@ class CPU:
     
     #loads first register with the value at the memory address stored in second register
     def handle_ld(self, reg_a, reg_b):
-        value = self.ram[self.reg[reg_b]]
-        self.reg[self_a] = value
+        # print(reg_a, reg_b)
+        # print([self.reg[reg_b]])
+        value = self.reg[reg_b]
+        self.reg[reg_a] = value
     
     #set the value of the register to an integer 
     def handle_ldi(self, reg_a, operand_b):
@@ -412,7 +430,7 @@ class CPU:
     #print alpha character value stored in the given registiver 
     def handle_pra(self, reg_a):
         #reg_a is the register number 
-        print(chr(self.reg[reg_a]))
+        print(chr(self.reg[reg_a]), end="")
 
     #prints numeric value stored in given register 
     def handle_prn(self, reg_a):
