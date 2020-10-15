@@ -20,6 +20,7 @@ class CPU:
         self.opcodes = {
             'ADD' : 0b10100000,
             'AND' : 0b10101000,
+            'CALL': 0b01010000,
             'CMP' : 0b10100111,
             'DEC' : 0b01100110,
             'DIV' : 0b10100011, 
@@ -33,6 +34,7 @@ class CPU:
             'POP' : 0b01000110,
             'PRN' : 0b01000111,
             'PUSH': 0b01000101,
+            'RET' : 0b00010001,
             'SHL' : 0b10101100,
             'SHR' : 0b10101101,
             'SUB' : 0b10100001,
@@ -57,6 +59,7 @@ class CPU:
         self.branchtable = {}
         self.branchtable[self.opcodes['ADD']] = self.handle_add
         self.branchtable[self.opcodes['AND']] = self.handle_and
+        self.branchtable[self.opcodes['CALL']] = self.handle_call
         self.branchtable[self.opcodes['CMP']] = self.handle_cmp
         self.branchtable[self.opcodes['DEC']] = self.handle_dec
         self.branchtable[self.opcodes['DIV']] = self.handle_div
@@ -70,6 +73,7 @@ class CPU:
         self.branchtable[self.opcodes['POP']] = self.handle_pop
         self.branchtable[self.opcodes['PUSH']] = self.handle_push
         self.branchtable[self.opcodes['PRN']] = self.handle_prn
+        self.branchtable[self.opcodes['RET']] = self.handle_ret
         self.branchtable[self.opcodes['SHL']] = self.handle_shl
         self.branchtable[self.opcodes['SHR']] = self.handle_shr
         self.branchtable[self.opcodes['SUB']] = self.handle_sub 
@@ -147,7 +151,6 @@ class CPU:
         """Run the CPU."""
         
         while not self.halted:
-            
             #gets the instruction from the memory using the address in pc 
             self.ir = self.ram[self.pc]
 
@@ -157,12 +160,11 @@ class CPU:
             #shift so that left with just the num of operands bits                
             num_operands = (self.ir & 0b11000000) >> 6
             #get if instruction is performed by alu
-            go_alu = (self.ir & 0b00100000) >> 5
+            go_alu = (self.ir & 0b00100000) >> 5 
             #get if instruction sets pc
-            set_pc = (self.ir & 0b00010000) >> 6 + 1
+            set_pc = (self.ir & 0b00010000) >> 4 
             #get instruction identifier
             ins = self.ir
-            
             
             #gets as many operands as the instruction byte indicates 
             if num_operands == 2:
@@ -172,7 +174,13 @@ class CPU:
                 
                 if bool(go_alu):
                     op = ""
-                    if ins == self.opcodes['MUL']:
+                    if ins == self.opcodes['ADD']:
+                        op = 'ADD'
+                    elif ins == self.opcodes['AND']:
+                        op = 'AND'
+                    elif ins == self.opcodes['CMP']:
+                        op = 'CMP'
+                    elif ins == self.opcodes['MUL']:
                         op = 'MUL'
                         
                     self.alu(op, operand_a, operand_b)
@@ -190,22 +198,14 @@ class CPU:
                         op = 'INC'
                         
                     self.alu(op, operand)
-                
-                #check if instruction identifier is push since the instruction identifier for INC and PUSh are the same
-                if self.ir == self.opcodes['PUSH']:
-                    self.branchtable[self.opcodes['PUSH']](operand)
-                    
-                #check if instruction identifier is pop since the instruction identifier for DEC and POP are the same
-                elif self.ir == self.opcodes['POP']:
-                    self.branchtable[self.opcodes['POP']](operand)
-                else:
-                    self.branchtable[ins](operand)
-                
-            if ins == self.opcodes['HLT']:
-                self.handle_hlt()
+
+                self.branchtable[ins](operand)
+            else:
+                self.branchtable[ins]()
 
             #gets the first two bits which gives us the number of operands in the self.ir
-            self.pc += num_operands + 1
+            if not bool(set_pc):
+                self.pc += num_operands + 1
             
             
     #adds the values in the two registers together and stores the result in the first register        
@@ -215,6 +215,15 @@ class CPU:
     #performs bitwise and on the values in the two registers and stores the result in the first register
     def handle_and(self, reg_a, reg_b):
         self.reg[reg_a] &= self.reg[reg_b]
+        
+    #calls a subroutine at the address stored in the register 
+    def handle_call(self, reg_a):
+        return_addr = self.pc + 2
+        self.push_val(return_addr)
+        #pc is set to address stored in given register
+        subroutine_addr = self.reg[reg_a]
+        self.pc = subroutine_addr
+        
         
     #compares the values in the two registers and sets the FL register based on the comparison
     def handle_cmp(self, reg_a, reg_b):
@@ -284,18 +293,13 @@ class CPU:
     def handle_prn(self, reg_a):
         #reg_a is the register number
          print(self.reg[reg_a])
+         
+    #returns from the subroutine
+    def handle_ret(self):
+        #pop value from top of stack
+        return_addr = self.pop_val()
+        self.pc = return_addr
         
-    def ram_read(self, address):
-        "Accept the address to read and returns the value stored there"
-        "Get the address through the pc register"
-        #return self.ram[self.mar] 
-        return self.ram[address]
-    
-    def ram_write(self, value):
-        "Writes the value to the address passed in"
-        "Gets the address through the pc register "
-        # self.ram[self.mar] = self.mdr
-        self.ram[self.pc] = value
         
     #shifts the value in the first register by the number of bits specified in the second register to the left 
     def handle_shl(self, reg_a, reg_b):
@@ -312,3 +316,31 @@ class CPU:
     #performs a bitwise XOR between the values in the two registers and stores the result in the first register 
     def handle_xor(self, reg_a, reg_b): 
         self.reg[reg_a] = self.reg[reg_a] ^ self.reg[reg_b] 
+        
+    def ram_read(self, address):
+        "Accept the address to read and returns the value stored there"
+        "Get the address through the pc register"
+        #return self.ram[self.mar] 
+        return self.ram[address]
+    
+    def ram_write(self, value):
+        "Writes the value to the address passed in"
+        "Gets the address through the pc register "
+        # self.ram[self.mar] = self.mdr
+        self.ram[self.pc] = value
+        
+    #helper functions 
+    def push_val(self, value):
+        #decrement the stack pointer
+        self.reg[SP] -= 1
+        #copy value onto the stack
+        top_of_stack_addr = self.reg[SP]
+        self.ram[top_of_stack_addr] = value
+        
+    def pop_val(self):
+        #get value from top of stack
+        top_of_stack_addr = self.reg[SP]
+        value = self.ram[top_of_stack_addr]
+        #increment SP
+        self.reg[SP] += 1
+        return value 
