@@ -29,11 +29,19 @@ class CPU:
             'HLT' : 0b00000001,
             'INC' : 0b01100101,
             'INT' : 0b01010010,
+            'JEQ' : 0b01010101,
+            'JGE' : 0b01011010,
+            'JGT' : 0b01010111,
+            'JLE' : 0b01011001, 
+            'JLT' : 0b01011000,
+            'JMP' : 0b01010100, 
+            'JNE' : 0b01010110,
+            'LD'  : 0b10000011,
             'LDI' : 0b10000010,
             'MOD' : 0b10100100,
-            'MUL' : 0b10100010,
-            'NOT' : 0b01101001,
+            'MUL' : 0b10100010, 
             'NOP' : 0b00000000,
+            'NOT' : 0b01101001,
             'OR'  : 0b10101010,
             'POP' : 0b01000110,
             'PRA' : 0b01001000,
@@ -75,6 +83,14 @@ class CPU:
             self.opcodes['HLT']: self.handle_hlt,
             self.opcodes['INC']: self.handle_inc,
             self.opcodes['INT']: self.handle_int,
+            self.opcodes['JEQ']: self.handle_jeq,
+            self.opcodes['JGE']: self.handle_jge,
+            self.opcodes['JGT']: self.handle_jgt,
+            self.opcodes['JLE']: self.handle_jle, 
+            self.opcodes['JLT']: self.handle_jlt,  
+            self.opcodes['JMP']: self.handle_jmp,
+            self.opcodes['JNE']: self.handle_jne,
+            self.opcodes['LD'] : self.handle_ld, ######
             self.opcodes['LDI']: self.handle_ldi,
             self.opcodes['MOD']: self.handle_mod,
             self.opcodes['MUL']: self.handle_mul,
@@ -270,6 +286,76 @@ class CPU:
         #re-enables interrupts
         self.reg[IS] = 0
         
+    #if equal flag is set to true, jump to the address stored in the given register
+    def handle_jeq(self, reg_a):
+        #get equal bit from flag byte
+        equal = self.fl & 0b11111111
+        #set pc to address stored in the register
+        if equal:
+            #use jmp function
+            self.handle_jmp(reg_a)
+    
+    #if greater than flag or equal flag is set to true, jump to the address stored in the given register
+    def handle_jge(self, reg_a):
+        #get equal bit from flag byte
+        equal = self.fl & 0b11111111
+        #get greater than bit flag from flag byte
+        greater = (self.fl & 0b11111111) >> 1
+        #set pc to address stored in register
+        if greater or equal:
+            #use jmp function
+            self.handle_jmp(reg_a)[reg_a]
+    
+    
+    #if greater than flag is set to true, jump to the address stored in the given register
+    def handle_jgt(self, reg_a):
+        #get greater than bit flag from flag byte
+        greater = (self.fl & 0b11111111) >> 1
+        
+        if greater:
+            #use jmp function
+            self.handle_jmp(reg_a)
+            
+    
+    #if less than or equal flag is set to true, jump to the address stored in the given register
+    def handle_jle(self, reg_a):
+        #get equal bit from flag byte
+        equal = self.fl & 0b11111111
+        #get less than bit from flag byte
+        less = (self.fl & 0b11111111) >> 2
+        
+        if less or equal:
+            #use jmp function
+            self.handle_jmp(reg_a)
+    
+    
+    #if less than flag is set to true, jump to the address stored in the given register
+    def handle_jlt(self, reg_a):
+        #get less than bit from flag byte
+        less = (self.fl & 0b11111111) >> 2
+        
+        if less:
+            #use jmp function
+            self.handle_jmp(reg_a)
+
+    #jump to address stored in the given register 
+    def handle_jmp(self, reg_a):
+        #set pc to address stored in given register 
+        self.pc = self.reg[reg_a]
+    
+    #if equal flag is false, jump to the address in the given register
+    def handle_jne(self, reg_a):
+        #get equal bit from flag byte
+        equal = self.fl & 0b11111111
+        
+        if not equal:
+            self.handle_jmp(reg_a)
+    
+    #loads first register with the value at the memory address stored in second register
+    def handle_ld(self, reg_a, reg_b):
+        value = self.ram[self.reg[reg_b]]
+        self.reg[self_a] = value
+    
     #set the value of the register to an integer 
     def handle_ldi(self, reg_a, operand_b):
         #operand_a is the register number
