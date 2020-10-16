@@ -10,7 +10,7 @@
 ;    PRN R0
 ;    HLT
 
-;Test JEQ, JGE 
+;Test JEQ, JGE, JGT, JLE, JLT, JMP, JNE
 ;
 ; Expected output:
 ; 1
