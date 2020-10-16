@@ -97,7 +97,7 @@ class CPU:
             self.opcodes['JLT']: self.handle_jlt,  
             self.opcodes['JMP']: self.handle_jmp,
             self.opcodes['JNE']: self.handle_jne,
-            self.opcodes['LD'] : self.handle_ld, ######
+            self.opcodes['LD'] : self.handle_ld, 
             self.opcodes['LDI']: self.handle_ldi,
             self.opcodes['MOD']: self.handle_mod,
             self.opcodes['MUL']: self.handle_mul,
@@ -146,7 +146,7 @@ class CPU:
 
 
     def alu(self, op, reg_a, reg_b=None):
-        """ALU operations."""
+        """ALU operations."""   
         
         #checks if op is div or mod to make sure you aren't dividing by 0
         if op == 'DIV' or op == 'MOD':
@@ -154,6 +154,8 @@ class CPU:
             if self.reg[reg_b] == 0:
                 print("You can't divide by zero. Stopping program")
                 self.handle_hlt()
+            
+            self.branchtable[self.opcodes[op]](reg_a, reg_b)
         
         #check if it's one of the operations with only 1 register needed
         elif op == 'INC' or op =='DEC' or op == 'NOT':
