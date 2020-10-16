@@ -256,7 +256,7 @@ class CPU:
             # self.trace()
             # print('--------------')            
            
-            # if self.counter > 20:
+            # if self.counter > 10:
             #     break
             
 
