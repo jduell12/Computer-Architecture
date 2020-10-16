@@ -258,7 +258,7 @@ class CPU:
             # self.trace()
             # print('--------------')            
            
-            # if self.counter > 10:
+            # if self.counter > 15:
             #     break
             
 
@@ -283,6 +283,10 @@ class CPU:
         
     #compares the values in the two registers and sets the FL register based on the comparison
     def handle_cmp(self, reg_a, reg_b):
+        # print('handle cmp')
+        # print('flag before', bin(self.fl))
+        # print('reg a', reg_a, self.reg[reg_a])
+        # print('reg b', reg_b, self.reg[reg_b])
         
         if self.reg[reg_a] > self.reg[reg_b]:
             #set the G flag to 1 while setting E and L flags to 0 using bitwise AND
@@ -295,7 +299,8 @@ class CPU:
             self.fl = self.fl & 0b00000000
             self.fl = self.fl | 0b00000001
             
-        # print('self.fl', bin(self.fl))
+        # print('self.fl after', bin(self.fl))
+        # print("")
         
     #subtracts 1 from the value in the given register
     def handle_dec(self, reg_a):
@@ -342,14 +347,12 @@ class CPU:
     
     #if greater than flag or equal flag is set to true, jump to the address stored in the given register
     def handle_jge(self, reg_a):
-        #get equal bit from flag byte
-        equal = self.fl & 0b11111111
-        #get greater than bit flag from flag byte
-        greater = (self.fl & 0b11111111) >> 1
+        #get fl
+        flag = self.fl
         #set pc to address stored in register
-        if greater or equal:
+        if bin(flag) == bin(0b00000011) or bin(flag) == bin(0b00000010) or bin(flag) == bin(0b00000001):
             #use jmp function
-            self.handle_jmp(reg_a)[reg_a]
+            self.handle_jmp(reg_a)
     
     
     #if greater than flag is set to true, jump to the address stored in the given register
