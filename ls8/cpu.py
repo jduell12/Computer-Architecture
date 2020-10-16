@@ -254,9 +254,9 @@ class CPU:
             self.counter += 1
             
             # self.trace()
-            # print('--------------')
-            
-            # if self.counter > 134:
+            # print('--------------')            
+           
+            # if self.counter > 20:
             #     break
             
 
@@ -281,8 +281,6 @@ class CPU:
         
     #compares the values in the two registers and sets the FL register based on the comparison
     def handle_cmp(self, reg_a, reg_b):
-        # if self.counter > 130:
-        #     print('before self.fl', bin(self.fl))
         
         if self.reg[reg_a] > self.reg[reg_b]:
             #set the G flag to 1 while setting E and L flags to 0 using bitwise AND
@@ -295,9 +293,8 @@ class CPU:
             self.fl = self.fl & 0b00000000
             self.fl = self.fl | 0b00000001
             
-        # if self.counter > 130:
-        #     print(bin(self.fl))
-            
+        # print('self.fl', bin(self.fl))
+        
     #subtracts 1 from the value in the given register
     def handle_dec(self, reg_a):
         self.reg[reg_a] -= 1
@@ -392,10 +389,13 @@ class CPU:
     #if equal flag is false, jump to the address in the given register
     def handle_jne(self, reg_a):
         #get equal bit from flag byte
-        equal = self.fl & 0b11111111
+        not_equal = self.fl & 0b11111111
         
-        if not equal:
+        #check for all types of non equality
+        if bin(not_equal) ==  bin(0b00000110) or bin(not_equal) == bin(0b00000100) or bin(not_equal) == bin(0b00000010):
             self.handle_jmp(reg_a)
+        else:
+            self.pc += 2
     
     #loads first register with the value at the memory address stored in second register
     def handle_ld(self, reg_a, reg_b):
