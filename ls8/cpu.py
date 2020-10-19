@@ -222,8 +222,9 @@ class CPU:
             ins = self.ir
             
 
-            # print(self.lookUpOpcodes[ins])
-            # self.trace()
+            
+            print(self.lookUpOpcodes[ins])
+            self.trace()
 
             
             #gets as many operands as the instruction byte indicates 
@@ -255,11 +256,12 @@ class CPU:
             
             self.counter += 1
             
-            # self.trace()
-            # print('--------------')            
+            
+            self.trace()
+            print('--------------')            
            
-            # if self.counter > 15:
-            #     break
+            if self.counter > 15:
+                break
             
 
     ############## functions for each instruction in spec ####################            
