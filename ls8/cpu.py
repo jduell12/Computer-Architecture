@@ -223,8 +223,8 @@ class CPU:
             
 
             
-            print(self.lookUpOpcodes[ins])
-            self.trace()
+            # print(self.lookUpOpcodes[ins])
+            # self.trace()
 
             
             #gets as many operands as the instruction byte indicates 
@@ -257,11 +257,11 @@ class CPU:
             self.counter += 1
             
             
-            self.trace()
-            print('--------------')            
+            # self.trace()
+            # print('--------------')            
            
-            if self.counter > 15:
-                break
+            # if self.counter > 30:
+            #     break
             
 
     ############## functions for each instruction in spec ####################            
@@ -310,7 +310,7 @@ class CPU:
         
     #divides the value in the first register by the value in the second register and stores the result in the first register
     def handle_div(self, reg_a, reg_b):
-        self.reg[reg_a] /= self.reg[reg_b]
+        self.reg[reg_a] //= self.reg[reg_b]
             
     #halts the CPU and exits the emulator 
     def handle_hlt(self):

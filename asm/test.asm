@@ -31,10 +31,8 @@
     CALL R2
     LDI R2, CheckJLE
     CALL R2
-    LDI R0, 4
-    LDI R1, 2
-    CMP R1, R0
-    JLE R2
+    LDI R2, CheckJLE2
+    CALL R2
     HLT
 
 CheckJEQ:
@@ -60,7 +58,14 @@ CheckJLE:
     LDI R2, Dec
     CMP R0, R1
     JLE R2
+    RET
+
+CheckJLE2:
     LDI R2, Div
+    LDI R0, 4
+    LDI R1, 2
+    CMP R1, R0
+    JLE R2
     RET
 
 Add:
