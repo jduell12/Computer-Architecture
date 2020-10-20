@@ -19,6 +19,7 @@
 ; 0
 ; 0
 ; 2
+; 2
 
 ;MAIN
     LDI R0, 1
@@ -32,6 +33,10 @@
     LDI R2, CheckJLE
     CALL R2
     LDI R2, CheckJLE2
+    CALL R2
+    LDI R2, CheckJLT
+    CALL R2
+    LDI R2, CheckJmp
     CALL R2
     HLT
 
@@ -68,6 +73,24 @@ CheckJLE2:
     JLE R2
     RET
 
+CheckJLT:
+    LDI R2, INC
+    DEC R0
+    CMP R0, R1
+    JLT R2
+    RET
+
+CheckJmp:
+    LDI R2, Add
+    JMP R2
+    RET
+
+CheckJNE:
+    LDI R2, Mod
+    CMP R0, R1
+    JNE R2
+    RET
+
 Add:
     ADD R0, R1
     PRN R0 
@@ -88,8 +111,17 @@ Div:
     PRN R0
     RET
 
+Inc:
+    INC R0
+    PRN R0
+    RET
+
 Mul:
     MUL R0, R1
     PRN R0
     RET
 
+Mod:
+    MOD R0, R1
+    PRN R0
+    RET
