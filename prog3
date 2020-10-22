@@ -1,0 +1,28 @@
+#SAVE_REG R0,12
+3
+0
+12
+#SAVE_REG R1, 37
+3
+1
+37
+#PUSH R0
+5
+0
+#PUSH R1
+5
+1
+#POP R0
+6
+0
+#POP R1
+6
+1
+#PRINT_REG R0
+4 
+0
+#PRINT_REG R1
+4 
+1
+#HLT 
+2

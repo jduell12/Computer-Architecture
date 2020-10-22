@@ -1,0 +1,18 @@
+#call the subroutine 
+
+3 #SAVE_REG R2, [addr_subroutine]
+2
+10
+7 #CALL R2
+2 
+7 #CALL R2
+2
+7 #CALL R2
+2
+
+2 #HALT
+
+#subroutine
+1 #PRINT_BEEJ
+1 #PRINT_BEEJ
+8 #RET
